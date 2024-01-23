@@ -1,0 +1,45 @@
+.maincontent {
+  padding: 24px; 
+  padding-top: 48px; 
+}
+
+.title {
+  font-size: 1.4rem;
+}
+
+.subtitle {
+  font-style: italic; 
+  text-decoration: underline; 
+}
+
+.content {
+  color: #333; 
+}
+
+.horizontalline {
+  margin-top: 20px; 
+  border-bottom: 1px solid #aaa; 
+}
+
+.card-title {
+  font-size: 1.0rem;
+  font-weight: bold; 
+  color: #666; 
+}
+
+.card-text {
+  height: 140px; 
+}
+.summary .row {
+  margin-top: 20px;
+}
+
+.summary .card {
+  border: none; 
+  background: initial; 
+}
+
+.summary .card-body {
+  
+} 
+

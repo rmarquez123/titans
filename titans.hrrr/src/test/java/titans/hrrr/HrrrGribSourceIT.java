@@ -16,7 +16,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import titans.hrrr.core.grib.HrrrGribSource;
 import titans.hrrr.core.grib.HrrrSfcInventoryReader;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 import titans.nam.grib.NamGribSource;
 import titans.noaa.core.NoaaVarClazz;
 import titans.noaa.core.NoaaVariable;

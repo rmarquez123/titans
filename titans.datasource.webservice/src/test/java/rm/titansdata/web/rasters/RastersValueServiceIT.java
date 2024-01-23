@@ -35,7 +35,7 @@ import rm.titansdata.web.JsonConverterUtil;
 import rm.titansdata.web.ZippedOutputUtil;
 import rm.titansdata.web.project.ProjectEntity;
 import rm.titansdata.web.project.ProjectService;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 
 /**
  *

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import titans.nam.NamRasterFactory;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 import titans.nam.grib.NamGribSource;
 
 /**

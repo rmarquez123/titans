@@ -19,7 +19,7 @@ import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.raster.Raster;
 import titans.goes.GoesRasterFactory;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 
 /**
  *

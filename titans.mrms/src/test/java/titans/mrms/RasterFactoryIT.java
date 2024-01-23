@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.raster.Raster;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 
 
 /**

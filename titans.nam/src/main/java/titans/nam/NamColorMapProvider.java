@@ -1,5 +1,6 @@
 package titans.nam;
 
+import titans.noaa.core.NoaaParameter;
 import java.io.File;
 import org.apache.commons.lang.math.DoubleRange;
 import org.springframework.beans.factory.annotation.Qualifier;

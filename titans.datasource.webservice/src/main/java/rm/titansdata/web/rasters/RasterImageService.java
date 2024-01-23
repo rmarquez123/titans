@@ -102,7 +102,7 @@ public class RasterImageService {
     } catch(Exception ex) {
       throw new RuntimeException(ex);
     }
-    String result = "http://localhost:8081/data/" + filename;
-    return result;
+    String result = "http://localhost:8081/titansdata.web.dev/data?code=" + filename;
+    return result;  
   }
 }

@@ -1,5 +1,6 @@
 package titans.nam;
 
+import titans.noaa.core.NoaaParameter;
 import common.RmTimer;
 import java.io.File;
 import java.time.LocalDateTime;

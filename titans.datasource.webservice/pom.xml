@@ -106,17 +106,15 @@
       <type>jar</type>
     </dependency>
     
-    <dependency>
-      <groupId>rm</groupId>
-      <artifactId>titans.nam</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <scope>test</scope>
-      <type>jar</type>
-    </dependency>
     
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>titans.auth</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>titans.noaa</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

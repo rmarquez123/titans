@@ -1,6 +1,5 @@
 package titans.nam.grib;
 
-import titans.noaa.grib.ForecastTimeReference;
 import com.google.common.base.Objects;
 import common.http.RmHttpReader;
 import java.time.ZoneId;
@@ -10,8 +9,9 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import javax.measure.unit.Unit;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 import titans.nam.core.NamInventoryReader;
+import titans.noaa.grib.ForecastTimeReference;
 
 /**
  *
@@ -26,7 +26,7 @@ public class NamGribNameScraper {
    * @return
    */
   public List<NoaaParameter> getParameters(String url, String parentKey, long minusDays) {
-    ZonedDateTime date = this.getDateForNamParameters(minusDays);
+    ZonedDateTime date = this.getDateForNamParameters(-1);
     String fullUrl = this.getNamParametersFullUrl(url, date);
     List<NoaaParameter> result = new RmHttpReader.Builder(fullUrl)
       .readTo((text) -> this.parseFullHtmlText(parentKey, date, text));

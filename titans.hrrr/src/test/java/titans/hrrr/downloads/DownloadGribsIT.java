@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import titans.hrrr.BaseSpringITest;
 import titans.hrrr.core.HrrrImporter;
 import titans.hrrr.core.grib.HrrrGribSource;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.core.NoaaVariable;
 import titans.noaa.grib.GribFile;
 

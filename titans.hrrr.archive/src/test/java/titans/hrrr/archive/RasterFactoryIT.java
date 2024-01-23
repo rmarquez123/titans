@@ -18,8 +18,8 @@ import rm.titansdata.SridUtils;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.raster.Raster;
-import titans.hrrr.core.grib.HrrrSfcInventoryReader;
-import titans.nam.NoaaParameter;
+import titans.hrrr.archive.core.HrrrSfcInventoryReader;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.grib.ForecastTimeReference;
 
 /**

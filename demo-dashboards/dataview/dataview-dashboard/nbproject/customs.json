@@ -1,0 +1,13 @@
+{
+  "elements": {
+    "app-root": {},
+    "selector": {},
+    "mapcomponent": {}
+  },
+  "attributes": {
+    "[(ngmodel)]": {},
+    "(ngsubmit)": {},
+    "[value]": {},
+    "*ngfor": {}
+  }
+}

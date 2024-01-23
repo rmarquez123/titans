@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import rm.titansdata.Parameter;
 import rm.titansdata.colormap.ColorMap;
 import rm.titansdata.plugin.ColorMapProvider;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.netcdf.NetCdfFile;
 
 /**

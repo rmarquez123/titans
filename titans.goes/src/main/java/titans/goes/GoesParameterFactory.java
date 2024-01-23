@@ -8,8 +8,8 @@ import java.util.List;
 import javax.measure.unit.Unit;
 import org.springframework.stereotype.Component;
 import rm.titansdata.Parameter;
-import titans.nam.NoaaFcstParameterFactory;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaFcstParameterFactory;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.core.FcstDateRange;
 import titans.noaa.core.InventoryReader;
 

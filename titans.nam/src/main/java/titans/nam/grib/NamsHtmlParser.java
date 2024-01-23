@@ -2,7 +2,7 @@ package titans.nam.grib;
 
 import java.util.ArrayList;
 import java.util.List;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 
 /**
  *

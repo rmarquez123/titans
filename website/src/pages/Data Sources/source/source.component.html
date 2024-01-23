@@ -1,0 +1,95 @@
+<div class="section usecases"> 
+  <div class="title"> 
+    {{title}}
+  </div>   
+  <div class="content"> 
+    <div class="container">
+      <div class="row mt-3">
+        <div class="col-6" style="height: 300px; overflow-y: scroll;"> 
+          <p> 
+            The High-Resolution Rapid Refresh (HRRR) is an advanced operational weather prediction system developed by the National Oceanic and Atmospheric Administration (NOAA). Here's a summary of its key features:
+          </p>
+          <ul>  
+            <li> 
+              <span style="font-weight: bold">Real-Time, High-Resolution Model:</span> The HRRR is a real-time atmospheric model with a 3-km resolution. It updates hourly, offering detailed and timely weather predictions​​.
+            </li>  
+            <li> 
+              <span style="font-weight: bold">Numerical Forecast Model and Analysis/Assimilation System:</span> It comprises a numerical forecast model coupled with an analysis/assimilation system that initializes the model. This system ensures accurate and up-to-date weather predictions​​.
+            </li> 
+            <li> 
+              <span style="font-weight: bold">Geographical Coverage: </span>The HRRR covers the conterminous United States and Alaska. For the contiguous U.S., it updates hourly, while for Alaska, it updates every three hours​​.
+            </li> 
+            <li> 
+              <span style="font-weight: bold">Vertical Levels and Model Implementation: </span>The model operates with 50 vertical levels, providing detailed atmospheric data from the surface up through the atmosphere. It is an implementation of the Advanced Research version of the Weather Research and Forecast (WRF-ARW) Model, specifically designed to allow convection processes within its predictions​​​​.
+            </li>
+            <li> 
+              <span style="font-weight: bold"> Specialized Applications for Fire and Smoke Prediction: </span>One of the notable applications of HRRR is its capability to ingest fire radiative power data from polar-orbiting NOAA and NASA satellites. This feature, known as HRRR-smoke, is used to calculate fire size, biomass burning emissions, and predict the height and spread of smoke plumes. Originally experimental, this capability is now a standard part of the operational HRRR system
+            </li> 
+          </ul> 
+        </div> 
+        <div class="col-6" style="font-size: 0.9rem; overflow-y: scroll; height: 300px;"> 
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>Number</th>
+                  <th>Level/Layer</th>
+                  <th>Parameter</th>
+                  <th>Forecast Valid</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>001 - 014</td>
+                  <td>50 mb</td>
+                  <td>Various</td>
+                  <td>analysis</td>
+                  <td>Includes variables like Geopotential Height, Temperature, Humidity, Wind Components, and Cloud/Ice/Water content at 50 mb atmospheric level.</td>
+                </tr>
+                <tr>
+                  <td>015 - 028</td>
+                  <td>75 mb</td>
+                  <td>Various</td>
+                  <td>analysis</td>
+                  <td>Similar variables as 50 mb, focusing on a higher atmospheric level (75 mb), providing data on atmospheric conditions and cloud parameters.</td>
+                </tr>
+                <tr>
+                  <td>029 - 042</td>
+                  <td>100 mb</td>
+                  <td>Various</td>
+                  <td>analysis</td>
+                  <td>Atmospheric parameters at 100 mb level, including temperature, humidity, wind, and cloud content, crucial for high-altitude weather analysis.</td>
+                </tr>
+                <tr>
+                  <td>546 - 558</td>
+                  <td>1013.2 mb</td>
+                  <td>Various</td>
+                  <td>analysis</td>
+                  <td>Measurements at sea level pressure (1013.2 mb), including temperature, humidity, cloud water, and atmospheric dynamics.</td>
+                </tr>
+                <tr>
+                  <td>560 - 577</td>
+                  <td>Various Soil Depths</td>
+                  <td>Soil Parameters</td>
+                  <td>analysis</td>
+                  <td>Soil measurements at various depths, including temperature and moisture content, indicating surface and subsurface conditions.</td>
+                </tr>
+                <tr>
+                  <td>578 - 708</td>
+                  <td>Various Special Layers</td>
+                  <td>Specialized Weather Parameters</td>
+                  <td>analysis</td>
+                  <td>Includes specialized parameters like composite reflectivity, lightning, wind gusts, vertical velocities, and simulated brightness temperatures for different layers.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div> 
+      </div> 
+    </div> 
+  </div>
+  <div class="horizontalline">
+  </div> 
+</div> 

@@ -1,0 +1,42 @@
+.header {
+  background-color: #333;
+  color: white;
+  height: 100%; 
+  padding: 24px; 
+  padding-top: 48px;
+  padding-left: 36px;
+}
+
+.blah.selected {
+  font-weight: bolder;
+  text-decoration: underline;
+}
+
+.company-text {
+  font-size: 1.6rem;
+  color: lightgray;
+}
+.branding-text {
+  font-size: 0.75rem;
+  color: lightgray;
+}
+
+
+.menuitems {
+  color: lightgray;
+  padding-left: 0px;
+}
+
+.menuitems > li{
+  list-style: none;
+  list-style-type: none;
+}
+
+a {
+  color: white!important;  
+  text-decoration: none; 
+}
+
+li {
+
+}

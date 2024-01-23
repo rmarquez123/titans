@@ -1,0 +1,19 @@
+<div class="header">
+
+  <div class="branding section company-text">
+    TerraByte Analytics
+  </div>
+  <div class="branding section branding-text">
+    Bringing together publicly available data into one place 
+    so that it is easier to find, more accessible, and ultimately making it 
+    easier to use for quick evaluation purposes.
+  </div>
+  <div class="section">
+    <ul class="menuitems">
+      <li *ngFor="let item of items"> 
+        <a class="blah" [routerLink]="item.path" [ngClass]="{'selected': isRouteActive(item.path)}">{{item.title}}</a>
+        
+      </li>
+    </ul>
+  </div> 
+</div> 

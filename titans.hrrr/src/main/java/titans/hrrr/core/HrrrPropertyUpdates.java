@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import titans.hrrr.HrrrRasterFactory;
 import titans.hrrr.core.grib.HrrrGribSource;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 
 /**
  *

@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import titans.nam.BaseSpringTest;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 import titans.nam.core.NamImporter;
 import titans.nam.core.NamInventoryReader;
 import titans.nam.grib.NamGribSource;

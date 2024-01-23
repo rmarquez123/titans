@@ -52,7 +52,6 @@ export class SessionService {
     } else {
       localStorage.removeItem("token");
     }
-
   }
 
   /**

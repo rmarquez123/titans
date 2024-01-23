@@ -1,5 +1,6 @@
 package titans.nam;
 
+import titans.noaa.core.NoaaParameter;
 import java.io.File;
 import java.util.List;
 import java.util.Set;

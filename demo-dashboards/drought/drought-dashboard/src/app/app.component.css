@@ -1,0 +1,158 @@
+body {
+  padding: 20px 20px;
+}
+div {
+  font-family: Helvetica, sans-serif;
+}
+.container {
+  margin: 0px;
+  align-content: space-around;
+  width: 100% !important;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: center;
+  margin: auto;
+}
+.element {
+  text-align: center;
+  padding-left: 5px;
+}
+
+.group {
+  padding: 3px 0;
+}
+
+.group-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  height: 100%;
+  padding: 6px;
+  box-shadow: 0.5px 0.5px 0.5px 0px #fff;
+  background-color: white;
+}
+
+.series {
+  height: 100%;
+  width: calc(100% - 560px);
+}
+
+.header {
+  height: 60px;
+  font-size: 1.6rem;
+  font-weight: bold;
+  padding-left: 20px;
+  padding-right: 20px;
+  line-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  text-align: left;
+  background: #354259;
+  color: white;
+  box-shadow: 3px 2px 4px 0px lightgray
+}
+
+.title-metricvalues {
+  line-height: 1.2rem;
+  font-weight: bold;
+  color: #6f6f6f;
+  padding-top: 6px;
+}
+
+.metricvalues > .element {
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+}
+
+.metricvalues > .element > .value {
+  font-size: 1.4rem;
+  font-weight: bold;
+  /*line-height: 1.5rem;*/
+  padding: 5px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.metricvalues > .change > .value  {
+  background-color: rgb(221,112,112);
+  color: whitesmoke;
+  padding: 5px;
+  border-radius: 2px
+}
+.element .title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: left;
+  color: #6f6f6f;
+
+}
+
+.left-col {
+  position: relative;
+}
+
+.left-col::after {
+  content: "";
+  position: absolute;
+  top: 12%; 
+  bottom: 12%;
+  right: 0;
+  width: 0.5px; 
+  background-color: #bfbfbf; 
+}
+
+.metricvalues > .element > .text {
+  font-size: 0.8rem;
+  line-height: 0.8rem;
+  padding-bottom: 5px;
+  color: #6f6f6f; 
+}
+
+.left-bar > .element {
+  height: 50%; 
+}
+.right-bar > .element {
+  height: 50%; 
+}
+
+.metricvalues {
+  min-height: 50px;
+
+}
+.metricvalues > .element {
+  vertical-align: middle;
+
+  line-height: 100%;
+  height: 100%;
+  display: flex;
+  align-content: center;
+  flex-wrap: nowrap;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.sidebar {
+  -ms-flex: 0 0 280px;
+  flex: 0 0 280px;
+  display:inline-block;
+} 
+
+.main-content {
+  min-height: 380px;
+  white-space: nowrap;
+  position: relative;
+}
+
+.summaries {
+  height:  240px;
+}
+
+@media (max-width: 690px) {
+  .sidebar {
+    display: none; 
+  } 
+}

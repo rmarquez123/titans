@@ -12,7 +12,7 @@ import {ProjectEntity} from './ProjectEntity';
   providedIn: 'root'
 })
 export class ProjectSource {
-  private baseUrl: string = "http://localhost:8081/titansdata.web.dev";
+  private baseUrl: string = "http://localhost:8081/titansdata.web.dev/";
   /**
    * 
    */
@@ -23,9 +23,10 @@ export class ProjectSource {
    * 
    */
   public loadProjects(): Observable<ProjectEntity[]> {
-    const url = this.baseUrl + "/getProjects";
+    const url = this.baseUrl + "getRasters";
     const params = new HttpParams();
-    const result = this.http.get(url, {params: params}).pipe<ProjectEntity[]>(map(this.responseToProjects.bind(this)));
+    const result = this.http.get(url, {params: params})
+      .pipe<ProjectEntity[]>(map(this.responseToProjects.bind(this)));
     return result;
   }
 

@@ -1,10 +1,16 @@
 package rm.titansdata.web.rasters;
 
 import common.RmTimer;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.measure.unit.Unit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
@@ -29,6 +35,7 @@ import rm.titansdata.web.ResponseHelper;
 import rm.titansdata.web.project.ProjectEntity;
 import rm.titansdata.web.user.session.SessionManager;
 import rm.titansdata.web.user.session.SessionScopedBean;
+import titans.noaa.core.NoaaParameter;
 
 /**
  *
@@ -88,6 +95,7 @@ public class RastersServlet {
     RequestParser parser = new RequestParser(req);
     Long rasterId = parser.getLong("rasterId");
     RasterEntity raster = this.rastersSourceService.getRaster(rasterId);
+
     String sourceTitle = raster.sourceTitle;
     Map<ClassType, List<Clazz>> a = this.parameterFactory.getClasses(sourceTitle);
     JSONObject f = new JSONObject();
@@ -219,9 +227,9 @@ public class RastersServlet {
     Bounds bounds = this.getBoundsFromProject();
     RasterCells values = this.rastersValueService
       .getRasterValues(rasterId, projectId, param, geometry, bounds);
-    
+
     map.put("values", values.toSrid(srid));
-    RmTimer timer = RmTimer.start();  
+    RmTimer timer = RmTimer.start();
     String result = JsonConverterUtil.toJson(values);
     this.responseHelper.sendAsZippedFile(result, res);
     timer.endAndPrint("sending");
@@ -243,7 +251,7 @@ public class RastersServlet {
     }
     JSONObject jsonObject = this.getParameterJson(parser);
     Parameter param = parameterFactory.get(jsonObject);
-    
+
     int projectId = this.getProjectId();
     Bounds bounds = this.getBoundsFromProject();
     this.rastersValueService
@@ -339,6 +347,28 @@ public class RastersServlet {
   }
 
   @RequestMapping(
+    path = "/getNoaaRasterImage",
+    params = {"rasterId", "variable", "datetime", "zoneId"},
+    method = RequestMethod.GET
+  )
+  public void getNoaaRasterImage(HttpServletRequest req, HttpServletResponse res) {
+    RequestParser parser = new RequestParser(req);
+    long rasterId = parser.getLong("rasterId");
+    String noaaVar = parser.getString("variable");
+    req.getParameter("datetime");
+    ZonedDateTime datetime = parser.getZonedDateTime("datetime", "zoneId");
+    String parentKey = this.rastersSourceService.getRaster(rasterId).sourceTitle;
+    Parameter param = new NoaaParameter(parentKey, datetime, 0, noaaVar, Unit.ONE);
+    Bounds bounds = this.getBoundsFromProject();
+    int projectId = this.getProjectId();
+    RasterImageResult image = this.rastersImageService.getRasterImage( //
+      rasterId, projectId, param, bounds);
+    Map<String, Object> map = new HashMap<>();
+    map.put("value", image);
+    this.responseHelper.send(map, res);
+  }
+
+  @RequestMapping(
     path = "/getRasterImage",
     params = {"rasterId", "parameter"},
     method = RequestMethod.GET
@@ -355,6 +385,33 @@ public class RastersServlet {
     Map<String, Object> map = new HashMap<>();
     map.put("value", image);
     this.responseHelper.send(map, res);
+  }
+
+  @RequestMapping(
+    path = "/data",
+    params = {"code"},
+    method = RequestMethod.GET
+  )
+  public void data(HttpServletRequest req, HttpServletResponse res) {
+    RequestParser parser = new RequestParser(req);
+    String code = parser.getString("code");
+    File f = new File("C:\\Servers\\apache-tomcat-8.5.45\\webapps\\data\\" + code);
+    try {
+      String contentType = "image/png";
+      res.setContentType(contentType);
+      res.setContentLength((int) f.length());
+      res.setHeader("Content-Disposition", "inline; filename=\"" + f.getName() + "\"");
+
+      try (OutputStream out = res.getOutputStream(); FileInputStream in = new FileInputStream(f)) {
+        byte[] buffer = new byte[4096];
+        int bytesRead;
+        while ((bytesRead = in.read(buffer)) != -1) {
+          out.write(buffer, 0, bytesRead);
+        }
+      }
+    } catch (IOException e) {
+      res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**

@@ -12,11 +12,11 @@ import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import org.springframework.stereotype.Component;
 import rm.titansdata.Parameter;
-import titans.hrrr.core.grib.HrrrCombinedInventoryReader;
-import titans.nam.NoaaFcstParameterFactory;
-import titans.nam.NoaaParameter;
+import titans.hrrr.archive.core.HrrrCombinedInventoryReader;
 import titans.noaa.core.FcstDateRange;
 import titans.noaa.core.InventoryReader;
+import titans.noaa.core.NoaaFcstParameterFactory;
+import titans.noaa.core.NoaaParameter;
 
 /**
  *

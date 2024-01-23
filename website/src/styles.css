@@ -1,0 +1,17 @@
+html{
+  font-family: Helvetica;
+  font-size: 16px;
+  color: graytext; 
+  height: 100%; 
+}
+
+body {
+  background-color: #f9f9f9 !important; 
+  height: 100%; 
+}
+.container {
+  margin: 0;
+}
+.section {
+  margin-bottom: 10px 
+}

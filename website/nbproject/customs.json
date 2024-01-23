@@ -1,0 +1,24 @@
+{
+  "elements": {
+    "sourcesection": {
+      "attributes": {
+        "source": {}
+      }
+    },
+    "app-root": {},
+    "selector": {},
+    "mapcomponent": {},
+    "source": {}
+  },
+  "attributes": {
+    "[(ngmodel)]": {},
+    "(ngsubmit)": {},
+    "[value]": {},
+    "*ngfor": {
+      "context": "li"
+    },
+    "[ngclass]": {
+      "context": "a"
+    }
+  }
+}

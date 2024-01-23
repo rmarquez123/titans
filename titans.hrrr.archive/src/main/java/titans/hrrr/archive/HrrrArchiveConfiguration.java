@@ -5,7 +5,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 
 /**
  *

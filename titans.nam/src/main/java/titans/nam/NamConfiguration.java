@@ -1,5 +1,6 @@
 package titans.nam;
 
+import titans.noaa.core.NoaaParameter;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;

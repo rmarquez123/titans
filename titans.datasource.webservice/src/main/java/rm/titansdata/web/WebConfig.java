@@ -34,8 +34,6 @@ public class WebConfig implements WebMvcConfigurer {
     WebMvcConfigurer.super.addCorsMappings(registry);  
     registry.addMapping("/**")     
       .allowCredentials(true)    
-      .allowedOrigins(this.consumerUiOrigins.split(","))
-//      .allowedOrigins(this.consumerUiOrigins)
-      ;
+      .allowedOrigins(this.consumerUiOrigins.split(","));
   }
 }

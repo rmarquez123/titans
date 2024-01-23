@@ -3,7 +3,7 @@ package titans.hrrr.core.grib;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
-import titans.nam.NoaaParameter;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.core.NoaaGribSource;
 import titans.noaa.grib.GribFile;
 

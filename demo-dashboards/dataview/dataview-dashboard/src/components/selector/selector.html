@@ -1,0 +1,28 @@
+<form>
+  <div class="input"> 
+    <label for="dataSource">Data Source:</label>
+    <select name="dataSource" id="dataSource" [(ngModel)]="selectedSource">
+      <option *ngFor="let source of sources" [value]="source.rasterId">
+        {{source.name}}
+    </option>
+  </select>
+</div> 
+
+<div class="input"> 
+  <label for="variable">Variable:</label>
+  <select name="vars" id="vars" [(ngModel)]="selectedVar">
+    <option *ngFor="let sourceVar of vars" [value]="sourceVar.name">
+      {{sourceVar.name}}
+  </option>
+</select>
+</div> 
+
+<div class="input"> 
+  <label for="date">Date (UTC):</label>
+  <input type="date" id="dateInput" [(ngModel)]="selectedDate" style="display: block"/>  
+</div> 
+
+<div class="button-area">
+  <input type="submit" value="Submit" (click)="onSubmit()">
+</div> 
+</form>

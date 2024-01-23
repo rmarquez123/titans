@@ -45,10 +45,10 @@ public class ColorMapProviderFactory {
    */
   public ColorMapProvider getProvider(long rasterId, int projectId) {
     ColorMapProvider result;
-    if (providers.containsKey(rasterId)) {
-      result = this.providers.get(rasterId);
+    if (providers.containsKey(rasterId)) {   
+      result = this.providers.get(rasterId);   
     } else {
-      result = (int projectId1, Parameter param) -> defaultColorMap(projectId1, projectId1, param);
+      result = (int projectId1, Parameter param) -> defaultColorMap(rasterId, projectId1, param);
     }
     return result;
   }
