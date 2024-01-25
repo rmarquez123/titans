@@ -9,10 +9,10 @@
           http://www.springframework.org/schema/context classpath:./spring/spring-context.xsd   
 ">  
   <bean id="hrrr.arch.gribRootFolder" class="java.io.File">
-    <constructor-arg value="G:\tests\data\hrrr\arch\grib"/>
+    <constructor-arg value="D:\tests\data\hrrr\arch\grib"/>
   </bean>
   <bean id="hrrr.arch.netCdfRootFolder" class="java.io.File">
-    <constructor-arg value="G:\tests\data\hrrr\arch\netcdf"/>
+    <constructor-arg value="D:\tests\data\hrrr\arch\netcdf"/>
   </bean>
   <bean id="hrrr.arch.degribExe" class="java.io.File">
     <constructor-arg value="C:\\ndfd\\degrib\\bin\\degrib.exe"/>

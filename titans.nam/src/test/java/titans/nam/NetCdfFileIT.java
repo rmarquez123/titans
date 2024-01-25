@@ -15,7 +15,7 @@ public class NetCdfFileIT {
   
   @Test
   public void test() {
-    File file = new File("G:\\tests\\data\\UGRD_01070000.nc");
+    File file = new File("D:\\tests\\data\\UGRD_01070000.nc");
     NetCdfFile netcdffile = NetCdfFile.test("UGRD_10_HTGL", file);
     Unit<? extends Quantity> units = netcdffile.getUnits();
     System.out.println("units = " + units);

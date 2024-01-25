@@ -69,8 +69,8 @@ public class RastersServlet {
    * @param response
    */
   @RequestMapping(path = "/getRasters",
-    params = {"userId"},
-    method = RequestMethod.GET
+          params = {"userId"},
+          method = RequestMethod.GET
   )
   public void getRasters(HttpServletRequest req, HttpServletResponse response) {
     RequestParser parser = new RequestParser(req);
@@ -88,8 +88,8 @@ public class RastersServlet {
    * @param response
    */
   @RequestMapping(path = "/getRasterClasses",
-    params = {"rasterId"},
-    method = RequestMethod.GET
+          params = {"rasterId"},
+          method = RequestMethod.GET
   )
   public void getRasterClasses(HttpServletRequest req, HttpServletResponse response) {
     RequestParser parser = new RequestParser(req);
@@ -121,9 +121,9 @@ public class RastersServlet {
    * @param response
    */
   @RequestMapping(path = "/getRasterParameters", //
-    method = RequestMethod.GET, //
-    params = {"rasterId", "clazzes"
-    })//
+          method = RequestMethod.GET, //
+          params = {"rasterId", "clazzes"
+          })//
   public void getRasterParameters(HttpServletRequest req, HttpServletResponse response) {
     RequestParser parser = new RequestParser(req);
     Long rasterId = parser.getLong("rasterId");
@@ -138,9 +138,9 @@ public class RastersServlet {
     }
     List<Clazz> clazzes = this.parameterFactory.getClasse(sourceTitle, jsonArray);
     List<JSONObject> params = this.parameterFactory.getParameters(sourceTitle, clazzes)
-      .stream()
-      .map(p -> p.toJSONObject())
-      .collect(Collectors.toList());
+            .stream()
+            .map(p -> p.toJSONObject())
+            .collect(Collectors.toList());
     Map<String, Object> map = new HashMap<>();
     map.put("values", params);
     this.responseHelper.send(map, response);
@@ -185,8 +185,8 @@ public class RastersServlet {
   }
 
   @RequestMapping(path = "/getRaster",
-    params = "rasterId",
-    method = RequestMethod.GET
+          params = "rasterId",
+          method = RequestMethod.GET
   )
   public void getRaster(HttpServletRequest req, HttpServletResponse res) {
     RequestParser parser = new RequestParser(req);
@@ -198,8 +198,8 @@ public class RastersServlet {
   }
 
   @RequestMapping(path = "/getRastersByGroupId",
-    params = "rasterGroupId",
-    method = RequestMethod.GET)
+          params = "rasterGroupId",
+          method = RequestMethod.GET)
   public void getRastersByGroupId(HttpServletRequest req, HttpServletResponse res) {
     RequestParser parser = new RequestParser(req);
     Long rastersGroupId = parser.getLong("rasterGroupId");
@@ -210,8 +210,8 @@ public class RastersServlet {
   }
 
   @RequestMapping(
-    path = "/getRasterValues",
-    params = {"rasterId", "geometry", "parameter", "srid"}, method = RequestMethod.GET)
+          path = "/getRasterValues",
+          params = {"rasterId", "geometry", "parameter", "srid"}, method = RequestMethod.GET)
   public void getRasterValues(HttpServletRequest req, HttpServletResponse res) {
     RequestParser parser = new RequestParser(req);
     Long rasterId = parser.getLong("rasterId");
@@ -222,13 +222,10 @@ public class RastersServlet {
     }
     JSONObject jsonObject = this.getParameterJson(parser);
     Parameter param = parameterFactory.get(jsonObject);
-    Map<String, Object> map = new HashMap<>();
     int projectId = this.getProjectId();
     Bounds bounds = this.getBoundsFromProject();
     RasterCells values = this.rastersValueService
-      .getRasterValues(rasterId, projectId, param, geometry, bounds);
-
-    map.put("values", values.toSrid(srid));
+            .getRasterValues(rasterId, projectId, param, geometry, bounds);
     RmTimer timer = RmTimer.start();
     String result = JsonConverterUtil.toJson(values);
     this.responseHelper.sendAsZippedFile(result, res);
@@ -237,10 +234,12 @@ public class RastersServlet {
 
   /**
    *
+   * @param req
+   * @param res
    */
   @RequestMapping(
-    path = "/preload",
-    params = {"rasterId", "geometry", "parameter", "srid"}, method = RequestMethod.GET)
+          path = "/preload",
+          params = {"rasterId", "geometry", "parameter", "srid"}, method = RequestMethod.GET)
   public void preload(HttpServletRequest req, HttpServletResponse res) {
     RequestParser parser = new RequestParser(req);
     Long rasterId = parser.getLong("rasterId");
@@ -255,7 +254,7 @@ public class RastersServlet {
     int projectId = this.getProjectId();
     Bounds bounds = this.getBoundsFromProject();
     this.rastersValueService
-      .getRasterValues(rasterId, projectId, param, geometry, bounds);
+            .getRasterValues(rasterId, projectId, param, geometry, bounds);
     Map<String, Object> map = new HashMap<>();
     this.responseHelper.send(map, res);
   }
@@ -266,9 +265,9 @@ public class RastersServlet {
    * @param res
    */
   @RequestMapping(
-    path = "/getRasterValue",
-    params = {"rasterId", "point", "parameter", "srid"},
-    method = RequestMethod.GET
+          path = "/getRasterValue",
+          params = {"rasterId", "point", "parameter", "srid"},
+          method = RequestMethod.GET
   )
   public void getRasterValue(HttpServletRequest req, HttpServletResponse res) {
     RequestParser parser = new RequestParser(req);
@@ -290,9 +289,9 @@ public class RastersServlet {
    * @param res
    */
   @RequestMapping(
-    path = "/getRasterPointValues",
-    params = {"rasterId", "point", "parameters", "srid"},
-    method = RequestMethod.GET
+          path = "/getRasterPointValues",
+          params = {"rasterId", "point", "parameters", "srid"},
+          method = RequestMethod.GET
   )
   public void getRasterPointValues(HttpServletRequest req, HttpServletResponse res) {
     RequestParser parser = new RequestParser(req);
@@ -307,9 +306,9 @@ public class RastersServlet {
     Map<String, Object> map = new HashMap<>();
     int projectId = this.getProjectId();
     Map<Parameter, Double> values = this.rastersValueService //
-      .getPointRasterValues(rasterId, projectId, param, point);
+            .getPointRasterValues(rasterId, projectId, param, point);
     Map<String, Double> s = values.entrySet().stream()
-      .collect(Collectors.toMap(d -> d.getKey().getKey(), d -> d.getValue()));
+            .collect(Collectors.toMap(d -> d.getKey().getKey(), d -> d.getValue()));
     map.put("values", s);
     this.responseHelper.send(map, res);
   }
@@ -347,31 +346,36 @@ public class RastersServlet {
   }
 
   @RequestMapping(
-    path = "/getNoaaRasterImage",
-    params = {"rasterId", "variable", "datetime", "zoneId"},
-    method = RequestMethod.GET
+          path = "/getNoaaRasterImage",
+          params = {"rasterId", "variable", "datetime", "zoneId"},
+          method = RequestMethod.GET
   )
   public void getNoaaRasterImage(HttpServletRequest req, HttpServletResponse res) {
     RequestParser parser = new RequestParser(req);
     long rasterId = parser.getLong("rasterId");
     String noaaVar = parser.getString("variable");
-    req.getParameter("datetime");
+
     ZonedDateTime datetime = parser.getZonedDateTime("datetime", "zoneId");
     String parentKey = this.rastersSourceService.getRaster(rasterId).sourceTitle;
     Parameter param = new NoaaParameter(parentKey, datetime, 0, noaaVar, Unit.ONE);
     Bounds bounds = this.getBoundsFromProject();
     int projectId = this.getProjectId();
     RasterImageResult image = this.rastersImageService.getRasterImage( //
-      rasterId, projectId, param, bounds);
+            rasterId, projectId, param, bounds);
     Map<String, Object> map = new HashMap<>();
     map.put("value", image);
     this.responseHelper.send(map, res);
   }
 
+  /**
+   *
+   * @param req
+   * @param res
+   */
   @RequestMapping(
-    path = "/getRasterImage",
-    params = {"rasterId", "parameter"},
-    method = RequestMethod.GET
+          path = "/getRasterImage",
+          params = {"rasterId", "parameter"},
+          method = RequestMethod.GET
   )
   public void getRasterImage(HttpServletRequest req, HttpServletResponse res) {
     RequestParser parser = new RequestParser(req);
@@ -381,27 +385,34 @@ public class RastersServlet {
     Bounds bounds = this.getBoundsFromProject();
     int projectId = this.getProjectId();
     RasterImageResult image = this.rastersImageService.getRasterImage( //
-      rasterId, projectId, param, bounds);
+            rasterId, projectId, param, bounds);
     Map<String, Object> map = new HashMap<>();
     map.put("value", image);
     this.responseHelper.send(map, res);
   }
-
+  
+  @Autowired
+  private ImageDirectoryService directoryService;
+  
+  /**
+   *
+   * @param req
+   * @param res
+   */
   @RequestMapping(
-    path = "/data",
-    params = {"code"},
-    method = RequestMethod.GET
+          path = "/data",
+          params = {"code"},
+          method = RequestMethod.GET
   )
   public void data(HttpServletRequest req, HttpServletResponse res) {
     RequestParser parser = new RequestParser(req);
     String code = parser.getString("code");
-    File f = new File("C:\\Servers\\apache-tomcat-8.5.45\\webapps\\data\\" + code);
+    File f = this.directoryService.getImageFile(code);
     try {
       String contentType = "image/png";
       res.setContentType(contentType);
       res.setContentLength((int) f.length());
       res.setHeader("Content-Disposition", "inline; filename=\"" + f.getName() + "\"");
-
       try (OutputStream out = res.getOutputStream(); FileInputStream in = new FileInputStream(f)) {
         byte[] buffer = new byte[4096];
         int bytesRead;

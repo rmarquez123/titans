@@ -17,9 +17,9 @@ import org.locationtech.jts.geom.Point;
  *
  * @author Ricardo Marquez
  */
-public class JsonConverterUtil {  
-    
-  /**
+public class JsonConverterUtil {      
+      
+  /**  
    * 
    * @param obect
    * @return 

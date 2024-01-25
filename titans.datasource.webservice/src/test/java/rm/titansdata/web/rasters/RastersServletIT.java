@@ -47,6 +47,7 @@ public class RastersServletIT {
 
   /**
    *
+   * @param userId
    * @throws Exception
    */
   @Test
@@ -62,6 +63,7 @@ public class RastersServletIT {
 
   /**
    *
+   * @param rasterId
    * @throws Exception
    */
   @Test

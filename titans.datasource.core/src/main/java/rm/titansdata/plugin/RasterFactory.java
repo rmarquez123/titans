@@ -18,8 +18,11 @@ public interface RasterFactory {
   
   /**
    * Creates a Raster based on project id, parameter, bounds, and dimensions. 
+   * @param projectId
+   * @param param
    * @param bounds
    * @param dims 
+   * @return  
    * @see Raster
    */
   public Raster create(int projectId, Parameter param, Bounds bounds, Dimensions dims); 

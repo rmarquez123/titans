@@ -46,8 +46,8 @@ public class HrrrGribSourceIT {
   @Test
   @Ignore
   public void test03() throws Exception {
-    File g = new File("G:\\tests\\data\\test.grib2");
-    File gidx = new File("G:\\tests\\data\\grib2.idx");
+    File g = new File("D:\\tests\\data\\test.grib2");
+    File gidx = new File("D:\\tests\\data\\grib2.idx");
     NamGribSource source = new NamGribSource();
     ZonedDateTime datetime = ZonedDateTime.now().minusDays(1).truncatedTo(ChronoUnit.DAYS);
     NoaaVariable var = new NoaaVariable("TMP_2-HTGL", SI.CELSIUS);
@@ -70,8 +70,8 @@ public class HrrrGribSourceIT {
 
   @Test
   public void test04() throws Exception {
-    File g = new File("G:\\tests\\data\\test.grib2");
-    File gidx = new File("G:\\tests\\data\\grib2.idx");
+    File g = new File("D:\\tests\\data\\test.grib2");
+    File gidx = new File("D:\\tests\\data\\grib2.idx");
     NoaaVariable var = new NoaaVariable("TMP_2-HTGL", SI.CELSIUS);
     GribFile file = new GribFile(ZonedDateTime.now(), 0, var, g, gidx);
     boolean locked = file.isLocked();

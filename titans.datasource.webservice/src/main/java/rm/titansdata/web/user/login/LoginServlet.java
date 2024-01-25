@@ -58,7 +58,9 @@ public class LoginServlet extends HttpServlet{
     }  else {
       authToken = this.service.loginUser(credentials);
     }
-    
+    if (!authToken.isPresent()) {
+      throw new RuntimeException("Invalid credentials");
+    }
     response.setHeader("AUTH-TOKEN", authToken.orElse(null));
     
     HashMap<String, Object> map = new HashMap<>();

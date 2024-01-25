@@ -26,9 +26,7 @@ public class RegisterJarsServlet {
 
   @RequestMapping(path = "/registerJar",
      params = {"jarfile", "class"},
-     
-     method = RequestMethod.POST
-  )
+     method = RequestMethod.POST)
   public void registerJar(HttpServletRequest req, HttpServletResponse res) {
     String f = req.getParameter("jarfile");
     String classe = req.getParameter("class");

@@ -65,14 +65,20 @@ public class CustomClassLoader {
   public synchronized void loadLibrary(File jar, String... classes) {
     try {
       URL url = jar.toURI().toURL();
+      
+      ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();      
       Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
       method.setAccessible(true);
-      method.invoke(Thread.currentThread().getContextClassLoader(), new Object[]{url});
+      method.invoke(contextClassLoader, new Object[]{url}); 
+//      URLClassLoaderWrapper wrapper = new URLClassLoaderWrapper(new URL[]{}, contextClassLoader);
+//      Thread.currentThread().setContextClassLoader(wrapper);
+//      wrapper.addURL(url);
+      
       DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) this.applicationContext.getBeanFactory();
-      for (String classe : classes) {
-        if (classe.endsWith(".xml")) {
+      for (String classe : classes) {  
+        if (classe.endsWith(".xml")) {  
           this.loadSpringXml(jar, classe);
-        } else {
+        } else {  
           this.loadByClass(classe, beanFactory);
         }
       }

@@ -19,9 +19,8 @@ public class AuthConfiguration {
   public DbConnection conn() {
     DbConnection result = new DbConnection.Builder()
       .setUrl("localhost")
-      .setPort(5434)
+      .setPort(5432)
       .setDatabaseName("titans.application")
-      .setUser("postgres")
       .setUser("postgres")
       .setPassword("postgres")
       .createDbConnection();

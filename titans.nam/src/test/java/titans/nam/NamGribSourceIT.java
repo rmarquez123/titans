@@ -43,7 +43,7 @@ public class NamGribSourceIT {
   @Ignore
   public void test03() {
     File degribExe = new File("C:\\ndfd\\degrib\\bin\\degrib.exe") ;
-    File gribFile = new File("G:\\tests\\data\\nam\\grib\\nam.t00z.conusnest.hiresf01.tm00.grib2");
+    File gribFile = new File("D:\\tests\\data\\nam\\grib\\nam.t00z.conusnest.hiresf01.tm00.grib2");
     GribFileVarsReader reader = new GribFileVarsReader(degribExe, gribFile);
     Set<String> varNames = reader.parseVarNames();
     for (String varName : varNames) {

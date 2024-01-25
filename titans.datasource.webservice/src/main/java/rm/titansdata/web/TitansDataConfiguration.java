@@ -15,10 +15,10 @@ public class TitansDataConfiguration {
   public DbConnection titansdbconn() {
     DbConnection result = new DbConnection.Builder()
       .setUrl("localhost")
-      .setPort(5434)
+      .setPort(5432)
       .setDatabaseName("titans.application")
       .setUser("postgres")
-      .setPassword("postgres")
+      .setPassword("postgres") 
       .createDbConnection();
     return result;
   }

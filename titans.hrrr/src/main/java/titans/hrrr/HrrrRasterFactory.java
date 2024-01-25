@@ -55,5 +55,4 @@ public class HrrrRasterFactory extends NoaaRasterFactory {
     return this.hrrrImporterBuilder
       .setSubfolderId(projectId).build();
   }
-
 }

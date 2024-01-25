@@ -13,6 +13,7 @@ public interface ColorMapProvider {
 
   /**
    *
+   * @param projectId
    * @param param
    * @return
    */

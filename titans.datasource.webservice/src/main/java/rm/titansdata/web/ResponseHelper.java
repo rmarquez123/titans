@@ -41,7 +41,9 @@ public class ResponseHelper {
   public void send(Map<String, ? extends Object> result, HttpServletResponse response) {
     response.setHeader("Access-Control-Allow-Origin", "*");
     try (PrintWriter writer = response.getWriter()) {
+      
       writer.write(JsonConverterUtil.toJson(result));
+      
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }

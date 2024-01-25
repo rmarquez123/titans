@@ -39,8 +39,8 @@ public class NamImporterIT {
    */
   @Test
   public void testimport() throws Exception {
-    File gribRootFolder = new File("G:\\tests\\data\\grib");
-    File netCdfRootFolder = new File("G:\\tests\\data\\netcdf");
+    File gribRootFolder = new File("D:\\tests\\data\\grib");
+    File netCdfRootFolder = new File("D:\\tests\\data\\netcdf");
     File degribExe = new File("C:\\ndfd\\degrib\\bin\\degrib.exe");
     String varName = "TMP_2-HTGL";
     String parentKey = "";

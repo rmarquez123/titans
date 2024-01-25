@@ -21,7 +21,7 @@ public class FcstVariablesIT {
   @Ignore
   @Parameters("")
   public void test(String nothing) {
-    File gribFile = new File("G:\\tests\\data\\grib\\nam.t00z.conusnest.hiresf01.tm00.grib2");
+    File gribFile = new File("D:\\tests\\data\\grib\\nam.t00z.conusnest.hiresf01.tm00.grib2");
     File degribExe = new File("C:\\ndfd\\degrib\\bin\\degrib.exe");
     GribFileVarsReader reader = new GribFileVarsReader(degribExe, gribFile); 
     Set<String> varNames = reader.parseVarNames();
@@ -35,7 +35,7 @@ public class FcstVariablesIT {
     "TMP_85000-ISBL, 484.0"
   })
   public void extractVarMsgNumber(String varName, String expresult) {
-    File gribFile = new File("G:\\tests\\data\\grib\\nam.t00z.conusnest.hiresf01.tm00.grib2");
+    File gribFile = new File("D:\\tests\\data\\grib\\nam.t00z.conusnest.hiresf01.tm00.grib2");
     File degribExe = new File("C:\\ndfd\\degrib\\bin\\degrib.exe");
     GribFileVarsReader reader = new GribFileVarsReader(degribExe, gribFile); 
     String varMsgNum = reader.getVarMsgNumber(varName);

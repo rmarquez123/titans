@@ -22,9 +22,9 @@ public class AuthenticatorIT extends BaseSpringTest {
 
   @Test
   @Parameters({
-    "ricardo.marquez@epstechnologies.com, password, true"
-    , "ricardo.marquez@epstechnologies.com, passwords, false"
-    , "ricardo.marquez@epstechnologie.com, password, false"
+    "ricardo.marquez@terrabyteanalytics.com, password, true"
+    , "ricardo.marquez@terrabyteanalytics.com, passwords, false"
+    , "ricardo.marquez@terrabyteanalytic.com, password, false"
   })
   public void authenticate_test(String email, String password, boolean expresult) {
     Optional<String> authToken = this.auth.authenticate(email, password);

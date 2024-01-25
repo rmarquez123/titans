@@ -25,6 +25,7 @@ public class Authenticator {
    *
    * @param email
    * @param password
+   * @return 
    */
   public Optional<String> authenticate(String email, String password) {
     String query = this.getAuthQuery(email, password);  

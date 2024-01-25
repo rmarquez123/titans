@@ -38,6 +38,12 @@
       <version>0.8</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>net.mahdilamb</groupId>
+      <artifactId>colormap</artifactId>
+      <version>0.9.511</version>
+      <type>jar</type>
+    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

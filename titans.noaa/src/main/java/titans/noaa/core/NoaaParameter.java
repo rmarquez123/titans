@@ -25,8 +25,11 @@ public class NoaaParameter implements Parameter {
 
   /**
    *
+   * @param parentKey
    * @param datetime
    * @param d
+   * @param noaaVar
+   * @param unit
    */
   public NoaaParameter(String parentKey, ZonedDateTime datetime, //
     ForecastTimeReference d, String noaaVar, Unit<?> unit) {
@@ -39,6 +42,7 @@ public class NoaaParameter implements Parameter {
    * @param datetime
    * @param fcststep
    * @param noaaVar
+   * @param unit
    */
   public NoaaParameter(String parentKey, 
     ZonedDateTime datetime, 

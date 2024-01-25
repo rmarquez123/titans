@@ -55,6 +55,8 @@ public class ProjectStore {
 
   /**
    *
+   * @param projectId
+   * @param rasterIds
    */
   public void removeProjectDataSources(int projectId, long[] rasterIds) {
     String statement = this.getRemoveProjectDataSources(projectId, rasterIds);
@@ -69,7 +71,7 @@ public class ProjectStore {
    */
   private String getCreateProjectStatement(int projectId, String name) {
     String result = "insert into projects.project(project_id, name) values \n"
-      + String.format("(%d, '%s')", projectId, name);
+            + String.format("(%d, '%s')", projectId, name);
     return result;
   }
 
@@ -80,7 +82,7 @@ public class ProjectStore {
    */
   private String getRemoveProjectStatement(int projectId) {
     String result = "delete from projects.project p \n"
-      + String.format("where p.project_id = %d", projectId);
+            + String.format("where p.project_id = %d", projectId);
     return result;
   }
 
@@ -90,7 +92,7 @@ public class ProjectStore {
    * @return
    */
   private String getSaveProjectGeometry(int projectId, Point lowerleft, Point upperight) {
-    String result;  
+    String result;
     if (lowerleft == null && upperight == null) {
       result = "delete from projects.project_envelope p where p.project_id = " + projectId;
     } else {
@@ -99,13 +101,13 @@ public class ProjectStore {
         throw new RuntimeException("Srids are not equal");
       }
       result = "insert into \n"
-        + "projects.project_envelope(project_id, lowerleft, upperright, srid) \n"
-        + String.format("values (%d, POINT(%f,%f), POINT(%f,%f), %d) \n",
-          projectId, lowerleft.getX(), lowerleft.getY(), upperight.getX(), upperight.getY(), srid)
-        + "on conflict (project_id) do update \n"
-        + "set lowerleft=excluded.lowerleft\n"
-        + ", upperright=excluded.upperright\n"
-        + ", srid=excluded.srid";
+              + "projects.project_envelope(project_id, lowerleft, upperright, srid) \n"
+              + String.format("values (%d, POINT(%f,%f), POINT(%f,%f), %d) \n",
+                      projectId, lowerleft.getX(), lowerleft.getY(), upperight.getX(), upperight.getY(), srid)
+              + "on conflict (project_id) do update \n"
+              + "set lowerleft=excluded.lowerleft\n"
+              + ", upperright=excluded.upperright\n"
+              + ", srid=excluded.srid";
     }
     return result;
   }
@@ -118,11 +120,11 @@ public class ProjectStore {
    */
   private String getRemoveProjectDataSources(int projectId, long[] rasterIds) {
     String q = Arrays.stream(rasterIds)
-      .mapToObj(Long::toString)
-      .collect(Collectors.joining(","));
+            .mapToObj(Long::toString)
+            .collect(Collectors.joining(","));
     String query = "delete from projects.projectdatasource where \n"
-      + String.format("project_id = %d\n", projectId)
-      + String.format(" and rastergroup_id = any(array[%s])", q);
+            + String.format("project_id = %d\n", projectId)
+            + String.format(" and rastergroup_id = any(array[%s])", q);
     return query;
   }
 
@@ -134,13 +136,13 @@ public class ProjectStore {
    */
   private String getAddProjectDataSourcesQuery(int projectId, long[] rasterIds) {
     String q = Arrays.stream(rasterIds)
-      .mapToObj(Long::toString)
-      .collect(Collectors.joining(","));
+            .mapToObj(Long::toString)
+            .collect(Collectors.joining(","));
     String query = "with params as (\n"
-      + String.format("	select unnest(array[%s]) as rastergroup_id\n", q)
-      + ")\n"
-      + "insert into projects.projectdatasource (project_id, rastergroup_id) \n"
-      + String.format("select %d, p.rastergroup_id from params p", projectId);
+            + String.format("	select unnest(array[%s]) as rastergroup_id\n", q)
+            + ")\n"
+            + "insert into projects.projectdatasource (project_id, rastergroup_id) \n"
+            + String.format("select %d, p.rastergroup_id from params p", projectId);
     return query;
   }
 

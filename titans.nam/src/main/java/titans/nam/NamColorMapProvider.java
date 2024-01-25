@@ -1,6 +1,5 @@
 package titans.nam;
 
-import titans.noaa.core.NoaaParameter;
 import java.io.File;
 import org.apache.commons.lang.math.DoubleRange;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Component;
 import rm.titansdata.Parameter;
 import rm.titansdata.colormap.ColorMap;
 import rm.titansdata.plugin.ColorMapProvider;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.netcdf.NetCdfFile;
 
 /**
@@ -53,8 +53,7 @@ public class NamColorMapProvider implements ColorMapProvider {
     ColorMap result = new ColorMap.Builder()
       .setXmin(r.getMinimumDouble())
       .setXmax(r.getMaximumDouble())
-      .setColorMin("#000")
-      .setColorMax("#fff")
+      .setColorMapName("Viridis")
       .build();
     return result;
   }

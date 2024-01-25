@@ -30,6 +30,9 @@ public class BucketListReader {
   
   /**
    * 
+   * @param var
+   * @param datetime
+   * @return 
    */
   public List<Content> read(String var, ZonedDateTime datetime) {
     List<String> lines = this.getLinesFromHttp(var, datetime);

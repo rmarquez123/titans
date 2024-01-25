@@ -35,7 +35,7 @@ public class RasterImage {
 
   /**
    *
-   */
+   * @return  */
   public BufferedImage asBufferedImage() {
     BufferedImage result = this.getInitialBufferedImage();
     WritableRaster writableRaster = this.asWritableRaster(result);
@@ -139,5 +139,13 @@ public class RasterImage {
    */
   public Bounds getBounds() {
     return this.r.getBounds();
+  }
+  
+  /**
+   * 
+   * @return 
+   */
+  public ColorMapObject colorMapObject() {
+    return new ColorMapObject(this.cmap.xmin, this.cmap.xmax, this.cmap.colorMapName); 
   }
 }

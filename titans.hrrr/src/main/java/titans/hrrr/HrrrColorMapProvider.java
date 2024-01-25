@@ -56,8 +56,7 @@ public class HrrrColorMapProvider implements ColorMapProvider {
     ColorMap result = new ColorMap.Builder()
       .setXmin(r.getMinimumDouble())
       .setXmax(r.getMaximumDouble())
-      .setColorMin("#000")
-      .setColorMax("#fff")
+      .setColorMapName("Viridis")
       .build();
     return result;
   }

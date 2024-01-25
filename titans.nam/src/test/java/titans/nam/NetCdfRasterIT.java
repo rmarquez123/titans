@@ -34,7 +34,7 @@ public class NetCdfRasterIT {
     "-121.43, 37.36"
   })
   public void test(double x, double y) {
-    File baseFolder = new File("G:\\tests\\data\\goes\\netcdf");
+    File baseFolder = new File("D:\\tests\\data\\goes\\netcdf");
     DateTimeFormatter formatter = new DateTimeFormatterBuilder()
       .appendPattern("yyyyMMddHHmm")
       .toFormatter();    
