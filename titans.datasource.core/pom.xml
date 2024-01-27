@@ -26,18 +26,20 @@
       <scope>test</scope>
       <type>jar</type>
     </dependency>
+    
     <dependency>
-      <groupId>org.apache.sis.core</groupId>
-      <artifactId>sis-referencing</artifactId>
-      <version>0.8</version>  
+      <groupId>org.locationtech.proj4j</groupId>
+      <artifactId>proj4j</artifactId>
+      <version>1.2.3</version>
       <type>jar</type>
     </dependency>
     <dependency>
-      <groupId>org.apache.sis.non-free</groupId>
-      <artifactId>sis-embedded-data</artifactId>
-      <version>0.8</version>
-      <scope>runtime</scope>
+      <groupId>org.locationtech.proj4j</groupId>
+      <artifactId>proj4j-epsg</artifactId>
+      <version>1.2.3</version>
+      <type>jar</type>
     </dependency>
+    
     <dependency>
       <groupId>net.mahdilamb</groupId>
       <artifactId>colormap</artifactId>
@@ -45,10 +47,16 @@
       <type>jar</type>
     </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+      <id>osgeo</id>
+      <name>OSGeo Repository</name>
+      <url>https://repo.osgeo.org/repository/release/</url>
+    </repository>
+  </repositories>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    
+    <maven.compiler.target>1.8</maven.compiler.target>    
   </properties>
 </project>

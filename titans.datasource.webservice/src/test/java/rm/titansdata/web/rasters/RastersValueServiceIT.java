@@ -1,6 +1,7 @@
 package rm.titansdata.web.rasters;
 
 import common.RmTimer;
+import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -13,7 +14,6 @@ import java.util.Map;
 import javax.measure.unit.SI;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

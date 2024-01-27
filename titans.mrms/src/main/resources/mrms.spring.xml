@@ -8,14 +8,5 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans classpath:./spring/spring-beans.xsd
           http://www.springframework.org/schema/context classpath:./spring/spring-context.xsd   
 ">  
-  <bean id="mrms.gribRootFolder" class="java.io.File">
-    <constructor-arg value="D:\tests\data\mrms\grib"/>
-  </bean>
-  <bean id="mrms.netCdfRootFolder" class="java.io.File">
-    <constructor-arg value="D:\tests\data\mrms\netcdf"/>
-  </bean>
-  <bean id="mrms.degribExe" class="java.io.File">
-    <constructor-arg value="C:\\ndfd\\degrib\\bin\\degrib.exe"/>
-  </bean>
   <context:component-scan base-package="titans.mrms"/>
 </beans>

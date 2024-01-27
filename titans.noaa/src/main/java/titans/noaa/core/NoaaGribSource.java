@@ -1,5 +1,6 @@
 package titans.noaa.core;
 
+import common.RmObjects;
 import common.RmTimer;
 import java.io.File;
 import java.io.InputStream;
@@ -19,6 +20,7 @@ public abstract class NoaaGribSource {
   /**
    *
    * @param gribFile
+   * @return
    */
   public final GribFile download(GribFile gribFile) {
     URL gribUrl = this.getGribUrl(gribFile);
@@ -37,6 +39,7 @@ public abstract class NoaaGribSource {
    */
   private URL getGribUrl(GribFile gribFile) {
     String urlText = this.createUrl(gribFile);
+    urlText = urlText.replaceAll("\\\\", File.separator);
     URL gribUrl = this.toUrlObject(urlText);
     return gribUrl;
   }
@@ -61,9 +64,9 @@ public abstract class NoaaGribSource {
     } catch (Exception ex) {
       gribFile.delete();
       throw new RuntimeException("Error on copying stream.  Check args:{"
-        + "output file : " + gribFile
-        + ", connection : " + gribUrl
-        + "}", ex);
+              + "output file : " + gribFile
+              + ", connection : " + gribUrl
+              + "}", ex);
     }
     timer.endAndPrint();
     GribFile result = this.onPostDownLoad(gribFile);
@@ -71,8 +74,10 @@ public abstract class NoaaGribSource {
   }
 
   private void createGribFileParent(GribFile gribFile) {
-    if (!gribFile.grib.getParentFile().exists()) {
-      gribFile.grib.getParentFile().mkdirs();
+    File parentFile = gribFile.grib.getParentFile();
+    boolean created = RmObjects.createDirectoryIfDoesNotExist(parentFile);
+    if (!created) {
+      throw new RuntimeException(String.format("Unable to make directory '%s'", parentFile));
     }
   }
 
@@ -122,6 +127,7 @@ public abstract class NoaaGribSource {
   /**
    *
    * @param gribFile
+   * @return
    */
   protected GribFile onPostDownLoad(GribFile gribFile) {
     return gribFile;

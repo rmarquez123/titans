@@ -20,7 +20,7 @@ public class GoesRasterFactory extends NoaaRasterFactory {
    * @param netCdfRootFolder 
    */
   public GoesRasterFactory(
-    @Qualifier("goes.netCdfRootFolder") File netCdfRootFolder) {
+    @Qualifier("netCdfRootFolder") File netCdfRootFolder) {
     this.netCdfRootFolder = netCdfRootFolder;
   }
 

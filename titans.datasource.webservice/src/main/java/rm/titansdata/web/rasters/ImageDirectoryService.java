@@ -1,6 +1,7 @@
 package rm.titansdata.web.rasters;
 
 import common.RmKeys;
+import common.RmObjects;
 import java.io.File;
 import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +18,17 @@ public class ImageDirectoryService {
   @Autowired
   @Qualifier("appProps")
   private Properties appProps;
-  
+    
+  /**
+   * 
+   * @param rasterId
+   * @return 
+   */
   public File createImageFile(long rasterId) {
     String filename = rasterId + "_" + RmKeys.createKey() + ".png";
     File relativePath = this.getRelativePath();
     File imageFile = new File(relativePath, filename);
-    if (!imageFile.getParentFile().exists()) {
-      imageFile.getParentFile().mkdirs();
-    }
+    RmObjects.createDirectoryIfDoesNotExist(imageFile.getParentFile());
     return imageFile;
   }
 

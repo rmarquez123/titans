@@ -52,7 +52,7 @@ public class GribCropper {
   private File getTempGribFile(GribFile gribFile) {
     String basefilename = gribFile.getBaseFileName().replace(".", "-");
     String tempgribfilename = String.format("cropped_%s.grb", basefilename);
-    File tempgrib = new File(gribFile.grib.getParent(), tempgribfilename);
+    File tempgrib = new File(gribFile.grib.getParent(), tempgribfilename.replaceAll("\\\\", File.separator));
     return tempgrib;
   }
 

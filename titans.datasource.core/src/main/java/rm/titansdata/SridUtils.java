@@ -1,83 +1,56 @@
 package rm.titansdata;
 
-import org.apache.sis.geometry.DirectPosition2D;
-import org.apache.sis.referencing.CRS;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.MultiPolygon;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.geom.PrecisionModel;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.CoordinateOperation;
+import java.util.HashMap;
+import java.util.Map;
+import org.locationtech.jts.geom.*;
+import org.locationtech.proj4j.CRSFactory;
+import org.locationtech.proj4j.CoordinateReferenceSystem;
+import org.locationtech.proj4j.CoordinateTransform;
+import org.locationtech.proj4j.CoordinateTransformFactory;
+import org.locationtech.proj4j.ProjCoordinate;
 
-/**
- *
- * @author Ricardo Marquez
- */
 public class SridUtils {
 
+  private final static CRSFactory crsFactory = new CRSFactory();
+  private final static CoordinateTransformFactory ctFactory = new CoordinateTransformFactory();
+  
+  private final static Map<String, CoordinateReferenceSystem> cache = new HashMap<>();
+  
   private SridUtils() {
   }
-
+  
   /**
-   *
+   * 
    * @param geometry
    * @param targetSrid
-   * @return
+   * @return 
    */
-  public static Geometry transform(Geometry geometry, int targetSrid) {
-    Geometry result;
-    GeometryFactory factory = new GeometryFactory(geometry.getPrecisionModel(), targetSrid);
-    if (geometry.getGeometryType().equals("MultiPolygon")) {
-      MultiPolygon mpolygon = (MultiPolygon) geometry;
-      int numPolygons = mpolygon.getNumGeometries();
-      Polygon[] polygons = new Polygon[numPolygons]; 
-      for (int i = 0; i < numPolygons; i++) {
-        Geometry a = mpolygon.getGeometryN(i); 
-        polygons[i] = (Polygon) transform(a, targetSrid); 
-      }
-      result = factory.createMultiPolygon(polygons); 
-    } else {
-      Coordinate[] coords = geometry.getCoordinates();
-      Coordinate[] transormedCoords = new Coordinate[coords.length];
-      int i = -1;
-      for (Coordinate coord : coords) {
-        i++;
-        Point p = geometry.getFactory().createPoint(coord);
-        Point transformedPoint = transform(p, targetSrid);
-        Coordinate transformedCoordinate = transformedPoint.getCoordinate();
-        transormedCoords[i] = transformedCoordinate;
-      }
-      String geometryType = geometry.getGeometryType();
-      switch (geometryType) {
-        case "Point":
-          result = factory.createPoint(transormedCoords[0]);
-          break;
-        case "MultiPoint":
-          result = factory.createMultiPoint(transormedCoords);
-          break;
-        case "Polygon":
-          result = factory.createPolygon(transormedCoords);
-          break;
-        case "LineString":
-          result = factory.createLineString(transormedCoords);
-          break;
-        case "LinearRing":
-          result = factory.createLinearRing(transormedCoords);
-          break;
-        default:
-          throw new RuntimeException( //
-            String.format("Unsupported geometry type: '%s'", geometryType));
-      }
-    }
+  public static synchronized Geometry transform(Geometry geometry, int targetSrid) {
+    String sourceCRSCode = "EPSG:" + geometry.getSRID();
+    String targetCRSCode = "EPSG:" + targetSrid;
+    CoordinateReferenceSystem sourceCRS = getCrs(sourceCRSCode);
+    CoordinateReferenceSystem targetCRS = getCrs(targetCRSCode);
+    CoordinateTransform transform = ctFactory.createTransform(sourceCRS, targetCRS);
+    Geometry result = transformGeometry(geometry, transform);
     return result;
   }
-
+    
   /**
-   *
+   * 
+   * @param code
+   * @return 
+   */
+  private static synchronized CoordinateReferenceSystem getCrs(String code) {
+    if (!cache.containsKey(code)) {
+      CoordinateReferenceSystem result = crsFactory.createFromName(code);
+      cache.put(code, result); 
+    } 
+    CoordinateReferenceSystem result = cache.get(code);
+    return result;
+  }
+  
+  /**
+   * 
    */
   public static void init() {
     try {
@@ -85,47 +58,62 @@ public class SridUtils {
       Point p = f.createPoint(new Coordinate(-121.43, 36.37));
       transform(p, 3857);
     } catch (Exception ex) {
-      throw new RuntimeException(ex);
+      throw new RuntimeException("Error initializing SridUtils", ex);
     }
   }
 
   public static Point transform(Point p, int targetSrid) {
-    if (targetSrid != p.getSRID()) {
-      try {
-        int sourceSrid = p.getSRID();
-        if (targetSrid == 4326) {
-
-          CoordinateReferenceSystem target = CRS.forCode("EPSG:" + targetSrid);
-          CoordinateReferenceSystem source = CRS.forCode("EPSG:" + sourceSrid);
-          CoordinateOperation op = CRS.findOperation(target, source, null);
-          DirectPosition ptSrc = new DirectPosition2D(p.getX(), p.getY());
-          DirectPosition ptDst = op.getMathTransform().inverse().transform(ptSrc, null);
-          p = createPoint(ptDst.getCoordinate()[1], ptDst.getCoordinate()[0], targetSrid);
-        } else if (sourceSrid == 4326) {
-          CoordinateReferenceSystem target = CRS.forCode("EPSG:" + targetSrid);
-          CoordinateReferenceSystem source = CRS.forCode("EPSG:" + sourceSrid);
-          CoordinateOperation op = CRS.findOperation(target, source, null);
-          DirectPosition ptSrc = new DirectPosition2D(p.getY(), p.getX());
-          DirectPosition ptDst = op.getMathTransform().inverse().transform(ptSrc, null);
-          p = createPoint(ptDst.getCoordinate()[0], ptDst.getCoordinate()[1], targetSrid);
-        } else {
-          CoordinateReferenceSystem target = CRS.forCode("EPSG:" + targetSrid);
-          CoordinateReferenceSystem source = CRS.forCode("EPSG:" + sourceSrid);
-          CoordinateOperation op = CRS.findOperation(source, target, null);
-          DirectPosition ptSrc = new DirectPosition2D(p.getX(), p.getY());
-          DirectPosition ptDst = op.getMathTransform().transform(ptSrc, null);
-          p = createPoint(ptDst.getCoordinate()[0], ptDst.getCoordinate()[1], targetSrid);
-        }
-      } catch (Exception ex) {
-        throw new RuntimeException(ex);
-      }
-    }
-    return p;
+    return (Point) transform((Geometry) p, targetSrid);
   }
 
-  private static Point createPoint(double x, double y, int srid) {
-    GeometryFactory f = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), srid);
-    Point result = f.createPoint(new Coordinate(x, y));
-    return result;
+  /**
+   *
+   * @param geometry
+   * @param transform
+   * @return
+   */
+  private static Geometry transformGeometry(Geometry geometry, CoordinateTransform transform) {
+    GeometryFactory factory = new GeometryFactory();
+    if (geometry instanceof Point) {
+      return transformPoint((Point) geometry, transform, factory);
+    } else if (geometry instanceof LineString) {
+      return transformLineString((LineString) geometry, transform, factory);
+    } else if (geometry instanceof Polygon) {
+      return transformPolygon((Polygon) geometry, transform, factory);
+    } else {
+      throw new RuntimeException("Invalid geometry");
+    }
+  }
+
+  private static LineString transformLineString(LineString lineString, CoordinateTransform transform, GeometryFactory factory) {
+    Coordinate[] sourceCoordinates = lineString.getCoordinates();
+    Coordinate[] targetCoordinates = new Coordinate[sourceCoordinates.length];
+
+    for (int i = 0; i < sourceCoordinates.length; i++) {
+      ProjCoordinate sourceCoord = new ProjCoordinate(sourceCoordinates[i].x, sourceCoordinates[i].y);
+      ProjCoordinate targetCoord = new ProjCoordinate();
+      transform.transform(sourceCoord, targetCoord);
+      targetCoordinates[i] = new Coordinate(targetCoord.x, targetCoord.y);
+    }
+
+    return factory.createLineString(targetCoordinates);
+  }
+
+  private static Polygon transformPolygon(Polygon polygon, CoordinateTransform transform, GeometryFactory factory) {
+    LinearRing shell = (LinearRing) transformLineString(polygon.getExteriorRing(), transform, factory);
+    LinearRing[] holes = new LinearRing[polygon.getNumInteriorRing()];
+
+    for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+      holes[i] = (LinearRing) transformLineString((LineString) polygon.getInteriorRingN(i), transform, factory);
+    }
+
+    return factory.createPolygon(shell, holes);
+  }
+  
+  private static Point transformPoint(Point point, CoordinateTransform transform, GeometryFactory factory) {
+    ProjCoordinate sourceCoord = new ProjCoordinate(point.getX(), point.getY());
+    ProjCoordinate targetCoord = new ProjCoordinate();
+    transform.transform(sourceCoord, targetCoord);
+    return factory.createPoint(new Coordinate(targetCoord.x, targetCoord.y));
   }
 }

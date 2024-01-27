@@ -6,10 +6,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import titans.nam.BaseSpringTest;
-import titans.noaa.core.NoaaParameter;
 import titans.nam.core.NamImporter;
 import titans.nam.core.NamInventoryReader;
 import titans.nam.grib.NamGribSource;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.core.NoaaVariable;
 
 /**
@@ -19,13 +19,13 @@ import titans.noaa.core.NoaaVariable;
 public class DownloadAllForDay extends BaseSpringTest {
 
   @Autowired
-  @Qualifier("nam.gribRootFolder")
+  @Qualifier("gribRootFolder")
   File gribRootFolder;
   @Autowired
-  @Qualifier("nam.netCdfRootFolder")
+  @Qualifier("netCdfRootFolder")
   File netCdfRootFolder;
   @Autowired
-  @Qualifier("nam.degribExe")
+  @Qualifier("degribExe")
   File degribExe;
 
   @Test

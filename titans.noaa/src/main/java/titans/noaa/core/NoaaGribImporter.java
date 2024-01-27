@@ -25,6 +25,9 @@ public abstract class NoaaGribImporter implements NoaaImporter {
   /**
    *
    * @param gribRootFolder
+   * @param netCdfRootFolder
+   * @param subfolderId
+   * @param degribExe
    */
   public NoaaGribImporter(File gribRootFolder, File netCdfRootFolder, int subfolderId, File degribExe) {
     this.gribRootFolder = gribRootFolder;
@@ -52,6 +55,10 @@ public abstract class NoaaGribImporter implements NoaaImporter {
     } else {
       netCdfFile = extractor.getNetCdfFile(datetime, fcststep);
     }
+    if (!netCdfFile.exists()) {
+      String message = "NetCdf File not extracted: " + netCdfFile.file;
+      throw new RuntimeException(message);
+    }
     RasterObj result;
     if (bounds == null) {
       result = this.rasterLoader.getRaster(netCdfFile);
@@ -73,11 +80,11 @@ public abstract class NoaaGribImporter implements NoaaImporter {
    */
   private NetCdfFile downloadAndExtract(NetCdfExtractor extractor, //
      Bounds bounds, ZonedDateTime datetimeref, int forecaststep) {
-    NetCdfFile netCdfFile;
+    NetCdfFile result;
     NoaaVariable var = extractor.getVar();
     GribFile gribFile = this.downloadGribFile(var, bounds, datetimeref, forecaststep);
-    netCdfFile = extractor.extract(gribFile);
-    return netCdfFile;
+    result = extractor.extract(gribFile);
+    return result;
   }
   
   
@@ -130,14 +137,15 @@ public abstract class NoaaGribImporter implements NoaaImporter {
 
   /**
    *
+   * @param var
    * @param forecaststep
    * @param datetimeref
    * @return
    */
   public final GribFile getGribFile(NoaaVariable var, ZonedDateTime datetimeref, int forecaststep) {
     String filename = this.getGribFileName(var, datetimeref, forecaststep);
-    File grib = new File(this.gribRootFolder, filename);
-    File gribIdx = new File(this.gribRootFolder, filename + ".idx");
+    File grib = new File(this.gribRootFolder, filename.replaceAll("\\\\", File.separator));
+    File gribIdx = new File(this.gribRootFolder, filename.replaceAll("\\\\", File.separator) + ".idx");
     GribFile result = new GribFile(datetimeref, forecaststep, var, grib, gribIdx);
     return result;
   }

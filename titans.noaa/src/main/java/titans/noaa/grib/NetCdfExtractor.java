@@ -1,11 +1,15 @@
 package titans.noaa.grib;
 
+import common.RmObjects;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import titans.noaa.core.NoaaVariable;
 import titans.noaa.netcdf.NetCdfFile;
@@ -28,17 +32,15 @@ public class NetCdfExtractor {
     this.subFolderId = subFolderId;
     this.var = var;
   }
-  
+
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
   public NoaaVariable getVar() {
     return var;
   }
 
-  
-  
   /**
    *
    * @param gribFile
@@ -53,56 +55,79 @@ public class NetCdfExtractor {
     }
     return netCdfFile;
   }
+
+  /**
+   *
+   * @param netCdfFile
+   */
+  private void createParentFileIfDoesNotExists(NetCdfFile netCdfFile) {
+    RmObjects.createFileIfDoesNotExists(netCdfFile.file.getParentFile());
+  }
+  
   
   /**
    * 
-   * @param netCdfFile 
+   * @param process
+   * @throws RuntimeException 
    */
-  private void createParentFileIfDoesNotExists(NetCdfFile netCdfFile) {
-    if (!netCdfFile.file.getParentFile().exists()) {
-      netCdfFile.file.getParentFile().mkdirs();
-    }
-  }
-
   private void runProcess(ProcessBuilder process) throws RuntimeException {
     try {
       Process p = process.start();
+      int exitValue = p.waitFor();
+      if (exitValue != 0) {
+        throw new RuntimeException("Process failed");
+      }
       InputStream in = p.getInputStream();
       List<String> lines = toListOfLines(in);
       printLines(lines);
       InputStream errorstream = p.getErrorStream();
       String errorMsg;
       if (errorstream != null && !(errorMsg = toMessage(errorstream)).isEmpty()) {
+        printLines(Arrays.asList(errorMsg));
         throw new RuntimeException(errorMsg);
       }
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
   }
-  
+
   /**
-   * 
+   *
    * @param gribFile
    * @param netCdfFile
-   * @return 
+   * @return
    */
-  private ProcessBuilder createProcessBuilder(GribFile gribFile, NetCdfFile netCdfFile) {
+  private ProcessBuilder createProcessBuilder( //
+          GribFile gribFile, NetCdfFile netCdfFile) {
     String messageNum = this.getVarMessageNum(gribFile);
-    ProcessBuilder result = new ProcessBuilder(
-      this.degribExe.getAbsolutePath().replace(".exe", ""),
-      gribFile.grib.getAbsolutePath().replace(".gz", ""),
-      "-msg", messageNum,
-      "-C",
-      "-NetCDF", "3",
-      "-out", netCdfFile.file.getAbsolutePath()
-    );
+
+    ProcessBuilder result;
+    if (this.degribExe.getName().contains("wgrib2")) {
+      int firstindex = messageNum.indexOf(":", 0);
+      int seondindex = messageNum.indexOf(":", firstindex + 1);
+      messageNum = messageNum.substring(seondindex + 1, messageNum.length() - 1);
+      messageNum = RmObjects.isWindows() ? "\"" + messageNum + "\"": messageNum ;
+      result = new ProcessBuilder(
+              this.degribExe.getAbsolutePath(),
+              gribFile.grib.getAbsolutePath().replace(".gz", ""),
+              "-netcdf", netCdfFile.file.getAbsolutePath(),
+              "-match", messageNum);
+    } else {
+      result = new ProcessBuilder(
+              this.degribExe.getAbsolutePath().replace(".exe", ""),
+              gribFile.grib.getAbsolutePath().replace(".gz", ""),
+              "-msg", messageNum,
+              "-C",
+              "-NetCDF", "3",
+              "-out", netCdfFile.file.getAbsolutePath()
+      );
+    }
     File workingDirectory = gribFile.grib.getParentFile();
     result.directory(workingDirectory);
     result.redirectErrorStream(true);
     return result;
   }
 
-  
   private static String toMessage(InputStream errorstream) throws IOException {
     return String.join("\n", toListOfLines(errorstream));
   }
@@ -125,8 +150,8 @@ public class NetCdfExtractor {
 
   /**
    *
-   * @param workingDirectory The working directory is typically the parent directory of
-   * the grib directory (gribFile.getParentFile())
+   * @param datetimeref
+   * @param forecaststep
    * @return
    */
   public boolean netCdfFileExists(ZonedDateTime datetimeref, int forecaststep) {
@@ -137,12 +162,13 @@ public class NetCdfExtractor {
 
   /**
    *
-   * @param workingDirectory
+   * @param datetimeref
+   * @param forecaststep
    * @return
    */
   public NetCdfFile getNetCdfFile(ZonedDateTime datetimeref, int forecaststep) {
     NetCdfFileOrganization org = new NetCdfFileOrganization( //
-      this.netcdfdir, this.subFolderId, forecaststep, datetimeref, var);
+            this.netcdfdir, this.subFolderId, forecaststep, datetimeref, var);
     NetCdfFile result = org.getNetCdfFile();
     return result;
   }
@@ -154,7 +180,8 @@ public class NetCdfExtractor {
   private void printLines(List<String> lines) {
     if (lines != null) {
       for (String string : lines) {
-        System.out.println("process output:" + string);
+        Logger.getLogger(NetCdfExtractor.class.getName()) //
+                .log(Level.INFO, "messages:\n{0}", string);
       }
     }
   }

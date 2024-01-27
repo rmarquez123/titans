@@ -24,6 +24,7 @@ public class GribFileVarsReader {
 
   /**
    *
+   * @param degribExe
    * @param gribFile
    */
   public GribFileVarsReader(File degribExe, File gribFile) {
@@ -33,6 +34,7 @@ public class GribFileVarsReader {
 
   /**
    *
+   * @return
    */
   public Set<String> parseVarNames() {
     ProcessBuilder process = this.createGribInventoryProcess();
@@ -63,9 +65,9 @@ public class GribFileVarsReader {
     String line;
     if (processOutput.size() > 1) {
       line = processOutput.stream().filter(l -> this.toVarName(l).equals(varName))
-      .findFirst().orElse(null);
+              .findFirst().orElse(null);
     } else {
-      line = processOutput.get(0); 
+      line = processOutput.get(0);
     }
     return line;
   }
@@ -101,8 +103,8 @@ public class GribFileVarsReader {
    */
   private Set<String> mapProcessOutputToVarNames(List<String> processOutput) {
     Set<String> resutl = processOutput.stream()
-      .map(this::toVarName)
-      .collect(Collectors.toSet());
+            .map(this::toVarName)
+            .collect(Collectors.toSet());
     return resutl;
   }
 
@@ -113,13 +115,40 @@ public class GribFileVarsReader {
    */
   private String toVarName(String line) {
     String result = null;
-    try {
-      String[] parts = line.split(",");
-      String elementPrefix = parts[3].split("=")[0].trim();
-      String level = parts[4].trim();
-      result = elementPrefix + "_" + level;
-    } catch (Exception ex) {
-      throw RmExceptions.create(ex, "An error occured on parsing line: '%s'", line);
+    if (!this.degribExe.getName().contains("wgrib2")) {
+      try {
+        String[] parts = line.split(",");
+        String elementPrefix = parts[3].split("=")[0].trim();
+        String level = parts[4].trim();
+        result = elementPrefix + "_" + level;
+      } catch (Exception ex) {
+        throw RmExceptions.create(ex, "An error occured on parsing line: '%s'", line);
+      }
+    } else {
+      try {
+        String[] parts = line.split(":");
+        String elementPrefix = parts[3].trim();
+        String level = parts[4].trim().replace(" mb", "00-ISBL")
+                .replace(" m above ground", "-HTGL")
+                .replace("surface", "0-SFC")
+                .replace("entire atmosphere (considered as a single layer)", "EATM")
+                .replace("entire atmosphere", "0-RESERVED(10)")
+                .replace("boundary layer cloud layer", "BCY")
+                .replace("top of atmosphere", "NTAT")
+                .replace("0C isotherm", "0-0DEG")
+                .replace("0C isotherm", "0-0DEG")
+                .replace("highest tropospheric freezing level", "HTFL")
+                .replace("cloud base", "0-CBL")
+                .replace("cloud top", "0-CTL")
+                .replace("mean sea level", "0-MSL")
+                .replace("middle cloud layer", "0-MCY")
+                .replace("low cloud layer", "0-LCY")
+                
+                ;
+        result = elementPrefix + "_" + level;
+      } catch (Exception ex) {
+        throw RmExceptions.create(ex, "An error occured on parsing line: '%s'", line);
+      }
     }
     return result;
   }
@@ -129,11 +158,18 @@ public class GribFileVarsReader {
    * @return
    */
   private ProcessBuilder createGribInventoryProcess() {
-    ProcessBuilder process = new ProcessBuilder(
-      this.degribExe.getAbsolutePath().replace(".exe", ""),
-      this.gribFile.getAbsolutePath().replace(".gz", ""),
-      "-I"
-    );
+    ProcessBuilder process;
+    if (!this.degribExe.getName().contains("wgrib2")) {
+      process = new ProcessBuilder(
+              this.degribExe.getAbsolutePath().replace(".exe", ""),
+              this.gribFile.getAbsolutePath().replace(".gz", ""),
+              "-I");
+    } else {
+      process = new ProcessBuilder(
+              this.degribExe.getAbsolutePath().replace(".exe", ""),
+              this.gribFile.getAbsolutePath().replace(".gz", ""));
+    }
+
     File workingDirectory = gribFile.getParentFile();
     process.directory(workingDirectory);
     process.redirectErrorStream(true);
@@ -156,10 +192,12 @@ public class GribFileVarsReader {
       }
       InputStream in = p.getInputStream();
       lines = IOUtils.readLines(in, Charset.forName("utf8"));
-      lines.stream().filter(l->l.contains("Error")).findFirst().ifPresent((errorline)->{
-        throw new RuntimeException(errorline); 
-      });   
-      lines.remove(0);
+      lines.stream().filter(l -> l.contains("Error")).findFirst().ifPresent((errorline) -> {
+        throw new RuntimeException(errorline);
+      });
+      if (!this.degribExe.getName().contains("wgrib2")) {
+        lines.remove(0);
+      }
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }

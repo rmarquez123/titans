@@ -20,13 +20,13 @@ import titans.noaa.grib.GribFile;
 public class DownloadGribsIT extends BaseSpringITest {
 
   @Autowired
-  @Qualifier("hrrr.gribRootFolder")
+  @Qualifier("gribRootFolder")
   File gribRootFolder;
   @Autowired
-  @Qualifier("hrrr.netCdfRootFolder")
+  @Qualifier("netCdfRootFolder")
   File netCdfRootFolder;
   @Autowired
-  @Qualifier("hrrr.degribExe")
+  @Qualifier("degribExe")
   File degribExe;
 
   @Test

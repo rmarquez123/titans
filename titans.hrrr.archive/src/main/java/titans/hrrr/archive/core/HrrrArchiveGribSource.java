@@ -3,8 +3,8 @@ package titans.hrrr.archive.core;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
-import titans.noaa.core.NoaaParameter;
 import titans.noaa.core.NoaaGribSource;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.grib.GribFile;
 
 /**
@@ -17,7 +17,6 @@ public class HrrrArchiveGribSource extends NoaaGribSource {
   
   /**
    *
-   * @param filename
    * @return
    */
   @Override

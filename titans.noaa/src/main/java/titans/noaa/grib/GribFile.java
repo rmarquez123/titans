@@ -1,5 +1,6 @@
 package titans.noaa.grib;
 
+import common.RmObjects;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -122,7 +123,7 @@ public class GribFile {
       this.gribIdx.delete();
     } catch (Exception ex) {
       Logger.getAnonymousLogger().log(Level.WARNING,// 
-        String.format("Deleting grib file '%s'", this.grib), ex);
+              String.format("Deleting grib file '%s'", this.grib), ex);
     }
   }
 
@@ -187,24 +188,26 @@ public class GribFile {
    * @return
    */
   public GribFile setSubPath(int subfolderId) {
-    File newgrib = new File(String.format("%s\\%04d", grib.getParent(), subfolderId), grib.getName());
-    File newgribIdx = new File(String.format("%s\\%04d", gribIdx.getParent(), subfolderId), gribIdx.getName());
+    File newgrib = new File(
+            String.format("%s\\%04d", grib.getParent(), subfolderId)
+                    .replaceAll("\\\\", File.separator), grib.getName());
+    File newgribIdx = new File(
+            String.format("%s\\%04d", gribIdx.getParent(), subfolderId)
+                    .replaceAll("\\\\", File.separator), gribIdx.getName());
     GribFile result = new GribFile(datetimeref, fcststep, var, newgrib, newgribIdx);
     return result;
   }
-  
+
   /**
-   * 
+   *
    */
   public void createFile() {
-    if (!this.grib.getParentFile().exists()) {
-      this.grib.getParentFile().mkdirs();
-    }
+    RmObjects.createFileIfDoesNotExists(grib.getParentFile());
     if (!this.grib.exists()) {
       try {
         this.grib.createNewFile();
       } catch (IOException ex) {
-        throw new RuntimeException(ex); 
+        throw new RuntimeException(ex);
       }
     }
   }

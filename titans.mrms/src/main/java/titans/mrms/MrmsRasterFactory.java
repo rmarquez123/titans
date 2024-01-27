@@ -16,10 +16,13 @@ public class MrmsRasterFactory extends NoaaRasterFactory {
   private final MrmsImporter.Builder importer;
 
   public MrmsRasterFactory(
-    @Qualifier("mrms.gribRootFolder") File gribRootFolder, 
-    @Qualifier("mrms.netCdfRootFolder") File netCdfRootFolder, 
-    @Qualifier("mrms.degribExe") File degribExe) {
-    this.importer = new MrmsImporter.Builder().setGribRootFolder(gribRootFolder).setNetCdfRootFolder(netCdfRootFolder).setDegribExe(degribExe);
+    @Qualifier("gribRootFolder") File gribRootFolder, 
+    @Qualifier("netCdfRootFolder") File netCdfRootFolder, 
+    @Qualifier("degribExe") File degribExe) {
+    this.importer = new MrmsImporter.Builder() //
+            .setGribRootFolder(new File(gribRootFolder, "mrms")) //
+            .setNetCdfRootFolder(new File(netCdfRootFolder, "mrms"))
+            .setDegribExe(degribExe);
   }
 
   @Override

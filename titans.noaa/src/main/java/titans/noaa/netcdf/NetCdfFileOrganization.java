@@ -29,7 +29,7 @@ public class NetCdfFileOrganization {
    * @param var
    */
   public NetCdfFileOrganization( //
-    File baseFolder, int subFolderId, int fcststep, ZonedDateTime datetime, NoaaVariable var) {
+          File baseFolder, int subFolderId, int fcststep, ZonedDateTime datetime, NoaaVariable var) {
     this.baseFolder = baseFolder;
     this.subFolderId = subFolderId;
     this.datetime = datetime;
@@ -39,17 +39,18 @@ public class NetCdfFileOrganization {
 
   /**
    *
+   * @return
    */
   public File getFile() {
     String subfilepath = this.getSubFilePath();
     File realBaseFolder = this.getBaseFolder();
-    File result = new File(realBaseFolder, subfilepath);
+    File result = new File(realBaseFolder, subfilepath.replaceAll("\\\\", File.separator));
     return result;
   }
-  
+
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
   private String getSubFilePath() {
     String filename = this.getFileName();
@@ -59,32 +60,31 @@ public class NetCdfFileOrganization {
     String child = String.format("%04d/%02d/%02d/%s", year, month, day, filename);
     return child;
   }
-  
+
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
   private String getFileName() {
     DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-      .appendPattern("yyyyMMddHHmm")
-      .toFormatter();
+            .appendPattern("yyyyMMddHHmm")
+            .toFormatter();
     String format = this.datetime.format(formatter);
     String varName = var.getGribVarName();
     String filename = String.format("%s_%s_%03d.nc", varName.replace(".", "_dot_"), format, this.fcststep);
     return filename;
   }
-  
+
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
   private File getBaseFolder() {
     String subfolder = this.subFolderId < 0 ? "test" : String.format("%04d", this.subFolderId);
-    File realBaseFolder = new File(baseFolder, subfolder);
+    File realBaseFolder = new File(baseFolder, subfolder.replaceAll("\\\\", File.separator));
     return realBaseFolder;
   }
-    
-  
+
   /**
    *
    * @return

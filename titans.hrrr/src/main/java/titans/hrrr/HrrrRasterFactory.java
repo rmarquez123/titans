@@ -13,25 +13,26 @@ import titans.noaa.core.NoaaRasterFactory;
  * @author Ricardo Marquez
  */
 @Component
-@DependsOn({"hrrr.gribRootFolder", "hrrr.degribExe"})
+@DependsOn({"gribRootFolder", "degribExe"})
 public class HrrrRasterFactory extends NoaaRasterFactory {
-  
+
   private final HrrrImporter.Builder hrrrImporterBuilder;
-  
+
   /**
-   * 
+   *
    * @param gribRootFolder
    * @param netCdfRootFolder
-   * @param degribExe 
+   * @param degribExe
    */
   public HrrrRasterFactory(
-    @Qualifier("hrrr.gribRootFolder") File gribRootFolder,
-    @Qualifier("hrrr.netCdfRootFolder") File netCdfRootFolder,
-    @Qualifier("hrrr.degribExe") File degribExe
+          @Qualifier("gribRootFolder") File gribRootFolder,
+          @Qualifier("netCdfRootFolder") File netCdfRootFolder,
+          @Qualifier("degribExe") File degribExe
   ) {
     this.hrrrImporterBuilder = new HrrrImporter.Builder()
-      .setDegribExe(degribExe).setGribRootFolder(gribRootFolder).setNetCdfRootFolder(netCdfRootFolder)
-      ;
+            .setDegribExe(degribExe)//
+            .setGribRootFolder(new File(gribRootFolder, "hrrr")) //
+            .setNetCdfRootFolder(new File(netCdfRootFolder, "hrrr"));
   }
 
   /**
@@ -43,16 +44,15 @@ public class HrrrRasterFactory extends NoaaRasterFactory {
     String key = "High Resolution Rapid Refresh";
     return key;
   }
-  
-  
+
   /**
-   * 
+   *
    * @param projectId
-   * @return 
+   * @return
    */
   @Override
   protected NoaaGribImporter getImporter(int projectId) {
     return this.hrrrImporterBuilder
-      .setSubfolderId(projectId).build();
+            .setSubfolderId(projectId).build();
   }
 }

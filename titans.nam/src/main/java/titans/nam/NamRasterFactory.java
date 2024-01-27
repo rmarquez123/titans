@@ -13,20 +13,24 @@ import titans.noaa.core.NoaaRasterFactory;
  * @author Ricardo Marquez
  */
 @Component
-@DependsOn({"nam.gribRootFolder", "nam.degribExe"}) 
+@DependsOn({"gribRootFolder", "degribExe"}) 
 public class NamRasterFactory extends NoaaRasterFactory {
   private final NamImporter.Builder namImporterBuilder;
   
   /**
    *
-   * @param forecaststep
-   * @param datetimeref
+   * @param gribRootFolder
+   * @param netCdfRootFolder
+   * @param degribExe
    */
   public NamRasterFactory(
-    @Qualifier("nam.gribRootFolder") File gribRootFolder, 
-    @Qualifier("nam.netCdfRootFolder") File netCdfRootFolder, 
-    @Qualifier("nam.degribExe") File degribExe) {
-    this.namImporterBuilder = new NamImporter.Builder().setGribRootFolder(gribRootFolder).setNetCdfRootFolder(netCdfRootFolder).setDegribExe(degribExe);
+    @Qualifier("gribRootFolder") File gribRootFolder, 
+    @Qualifier("netCdfRootFolder") File netCdfRootFolder, 
+    @Qualifier("degribExe") File degribExe) {
+    this.namImporterBuilder = new NamImporter.Builder() //
+            . setGribRootFolder(new File(gribRootFolder, "nam")) //
+            .setNetCdfRootFolder(new File(netCdfRootFolder, "nam")) //
+            .setDegribExe(degribExe);
   }
   
   /**

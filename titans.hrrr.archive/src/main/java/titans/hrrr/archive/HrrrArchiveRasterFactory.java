@@ -1,9 +1,9 @@
 package titans.hrrr.archive;
 
-import titans.hrrr.archive.core.HrrrArchiveImporter;
 import java.io.File;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import titans.hrrr.archive.core.HrrrArchiveImporter;
 import titans.noaa.core.NoaaGribImporter;
 import titans.noaa.core.NoaaRasterFactory;
 
@@ -16,14 +16,16 @@ public class HrrrArchiveRasterFactory extends NoaaRasterFactory {
 
   private final HrrrArchiveImporter.Builder hrrrImporterBuilder;
 
-  public HrrrArchiveRasterFactory(@Qualifier("hrrr.arch.gribRootFolder") File gribRootFolder,
-    @Qualifier("hrrr.arch.netCdfRootFolder") File netCdfRootFolder,
-    @Qualifier("hrrr.arch.degribExe") File degribExe) {
+  public HrrrArchiveRasterFactory(@Qualifier("gribRootFolder") File gribRootFolder,
+          @Qualifier("netCdfRootFolder") File netCdfRootFolder,
+          @Qualifier("degribExe") File degribExe) {
     this.hrrrImporterBuilder = new HrrrArchiveImporter.Builder()
-      .setDegribExe(degribExe).setGribRootFolder(gribRootFolder).setNetCdfRootFolder(netCdfRootFolder); 
-    
+            .setDegribExe(degribExe)
+            .setGribRootFolder(new File(gribRootFolder, "hrrr.archive"))
+            .setNetCdfRootFolder(new File(netCdfRootFolder, "hrrr.archive"));
+
   }
-  
+
   /**
    *
    * @return

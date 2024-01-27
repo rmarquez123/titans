@@ -12,18 +12,27 @@
   <import resource="classpath:../auth.spring.xml"/>
   <bean id="version" class="java.lang.String" factory-method="valueOf"> 
     <constructor-arg value="1.0.0"/> 
-  </bean>      
+  </bean> 
   <util:properties id="appProps" location="classpath:../app.properties"/> 
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="location">
       <value>classpath:../app.properties</value>
     </property>
   </bean>
+  <bean id="gribRootFolder" class="java.io.File">
+    <constructor-arg value="${files.grib}"/>
+  </bean>
+  <bean id="netCdfRootFolder" class="java.io.File">
+    <constructor-arg value="${files.netcdf}"/>
+  </bean>
+  <bean id="degribExe" class="java.io.File">
+    <constructor-arg value="${files.degribExe}"/>
+  </bean>
   <bean id="cors-list" class="java.lang.String" factory-method="valueOf"> 
     <constructor-arg value="${cors}"/>  
   </bean> 
   <mvc:cors>  
-    <mvc:mapping path="/**"  
+    <mvc:mapping path="/**"   
                  allowed-origins="*"    
                  allowed-methods="GET,PUT"
                  allowed-headers="Authorization,app_name"

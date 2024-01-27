@@ -1,5 +1,6 @@
 package titans.noaa.netcdf;
 
+import common.RmObjects;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -201,6 +202,7 @@ public class NetCdfFile {
   /**
    *
    * @param baseFolder
+   * @param subFolderId
    * @param namParameter
    * @return
    */
@@ -212,6 +214,7 @@ public class NetCdfFile {
     NetCdfFileOrganization org = new NetCdfFileOrganization(
       baseFolder, subFolderId, namParameter.fcststep, namParameter.datetime, var);
     File file = org.getFile();
+    RmObjects.createDirectoryIfDoesNotExist(file.getParentFile()); 
     NetCdfFile instance = new NetCdfFile(varName, file);
     return instance;
   }
@@ -251,10 +254,14 @@ public class NetCdfFile {
       throw new RuntimeException(ex);
     }
   }
-
+  
+  /**
+   * 
+   * @throws IOException 
+   */
   private void createFileIfNotExists() throws IOException {
     if (!this.exists()) {
-      this.file.getParentFile().mkdirs();
+      RmObjects.createDirectoryIfDoesNotExist(this.file.getParentFile()); 
       this.file.createNewFile();
     }
   }
