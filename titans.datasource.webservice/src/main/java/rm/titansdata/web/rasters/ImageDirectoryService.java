@@ -4,6 +4,7 @@ import common.RmKeys;
 import common.RmObjects;
 import java.io.File;
 import java.util.Properties;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -13,11 +14,26 @@ import org.springframework.stereotype.Service;
  * @author rmarq
  */
 @Service
-public class ImageDirectoryService {
+public class ImageDirectoryService implements InitializingBean{
   
   @Autowired
   @Qualifier("appProps")
   private Properties appProps;
+  
+  /**
+   * 
+   * @throws Exception 
+   */
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    if (!this.appProps.containsKey("imagedatapath")) {
+      throw new RuntimeException("'imagedatapath' is not defined"); 
+    }
+    if (!this.appProps.containsKey("imagedatapath_external_url")) {
+      throw new RuntimeException("'imagedatapath_external_url' is not defined"); 
+    }
+  }
+  
     
   /**
    * 
@@ -47,5 +63,14 @@ public class ImageDirectoryService {
     File relativePath = this.getRelativePath();
     File file = new File(relativePath, code);
     return file;
+  }
+  
+  /**
+   * 
+   * @return 
+   */
+  public String getExternalUrl() {
+    String result = this.appProps.getProperty("imagedatapath_external_url"); 
+    return result; 
   }
 }

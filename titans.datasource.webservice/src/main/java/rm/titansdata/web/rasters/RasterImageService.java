@@ -108,7 +108,8 @@ public class RasterImageService {
       throw new RuntimeException(ex);
     }
     this.servletContext.getContextPath();
-    String result = "http://localhost:8080/titansdata.web.dev/data?code=" + imageFile.getName();
+    String externalUrl = this.imageDirectory.getExternalUrl();
+    String result = externalUrl + File.separator + "data?code=" + imageFile.getName();
     return result;
   }
 }
