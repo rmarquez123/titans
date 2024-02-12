@@ -172,15 +172,18 @@ public class GribFile {
     }
     return true;
   }
-
+  
   /**
-   *
-   * @return
+   * 
+   * @return 
    */
   @Override
   public String toString() {
-    return "GribFile{" + "grib=" + grib + ", datetimeref=" + datetimeref + ", fcststep=" + fcststep + '}';
+    return "GribFile{" + "datetimeref=" + datetimeref + ", fcststep=" 
+            + fcststep + ", var=" + var + ", grib=" + grib + ", gribIdx=" + gribIdx + '}';
   }
+
+  
 
   /**
    *
@@ -190,10 +193,10 @@ public class GribFile {
   public GribFile setSubPath(int subfolderId) {
     File newgrib = new File(
             String.format("%s\\%04d", grib.getParent(), subfolderId)
-                    .replaceAll("\\\\", File.separator), grib.getName());
+                    .replace("\\", File.separator), grib.getName());
     File newgribIdx = new File(
             String.format("%s\\%04d", gribIdx.getParent(), subfolderId)
-                    .replaceAll("\\\\", File.separator), gribIdx.getName());
+                    .replace("\\", File.separator), gribIdx.getName());
     GribFile result = new GribFile(datetimeref, fcststep, var, newgrib, newgribIdx);
     return result;
   }

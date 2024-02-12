@@ -39,7 +39,9 @@ public class ProjectStore {
 
   /**
    *
-   */
+   * @param projectId
+   * @param lowerleft
+   * @param upperight */
   public void setProjectGeometry(int projectId, Point lowerleft, Point upperight) {
     String statement = this.getSaveProjectGeometry(projectId, lowerleft, upperight);
     this.conn.executeStatement(statement);
@@ -47,7 +49,8 @@ public class ProjectStore {
 
   /**
    *
-   */
+   * @param projectId
+   * @param rasterIds */
   public void addProjectDataSources(int projectId, long[] rasterIds) {
     String statement = this.getAddProjectDataSourcesQuery(projectId, rasterIds);
     this.conn.executeStatement(statement);
@@ -93,7 +96,7 @@ public class ProjectStore {
    */
   private String getSaveProjectGeometry(int projectId, Point lowerleft, Point upperight) {
     String result;
-    if (lowerleft == null && upperight == null) {
+    if (lowerleft == null || upperight == null) {
       result = "delete from projects.project_envelope p where p.project_id = " + projectId;
     } else {
       int srid = upperight.getSRID();

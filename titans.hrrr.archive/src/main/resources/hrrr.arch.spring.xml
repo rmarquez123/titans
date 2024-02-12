@@ -9,4 +9,13 @@
           http://www.springframework.org/schema/context classpath:./spring/spring-context.xsd   
 ">  
   <context:component-scan base-package="titans.hrrr.archive"/>
+  <bean id="gribRootFolder" class="java.io.File">
+    <constructor-arg value="D:\\tests\\data\\grib"/>
+  </bean>
+  <bean id="netCdfRootFolder" class="java.io.File">
+    <constructor-arg value="D:\\tests\\data\\netcdf"/>
+  </bean>
+  <bean id="degribExe" class="java.io.File">
+    <constructor-arg value="C:\\Users\\rmarq\\Downloads\\wgrib2\\wgrib2.exe"/>
+  </bean>
 </beans>

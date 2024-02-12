@@ -144,8 +144,9 @@ public abstract class NoaaGribImporter implements NoaaImporter {
    */
   public final GribFile getGribFile(NoaaVariable var, ZonedDateTime datetimeref, int forecaststep) {
     String filename = this.getGribFileName(var, datetimeref, forecaststep);
-    File grib = new File(this.gribRootFolder, filename.replaceAll("\\\\", File.separator));
-    File gribIdx = new File(this.gribRootFolder, filename.replaceAll("\\\\", File.separator) + ".idx");
+    String fileNameCorrected = filename.replace("\\", File.separator);
+    File grib = new File(this.gribRootFolder, fileNameCorrected);
+    File gribIdx = new File(this.gribRootFolder, fileNameCorrected + ".idx");
     GribFile result = new GribFile(datetimeref, forecaststep, var, grib, gribIdx);
     return result;
   }

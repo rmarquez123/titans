@@ -9,7 +9,17 @@ import javax.measure.unit.Unit;
  */
 public interface InventoryReader {
 
+  /**
+   * 
+   * @return 
+   */
   public List<NoaaVarClazz> read();
   
+  
+  /**
+   * 
+   * @param var
+   * @return 
+   */
   public Unit<?> getUnit(String var);
 }

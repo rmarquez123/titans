@@ -92,6 +92,7 @@ public class ProjectService {
   
   /**
    * 
+   * @param projectId
    * @return 
    */
   public ProjectEntity getProject(int projectId) {

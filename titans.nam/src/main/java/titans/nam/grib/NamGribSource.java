@@ -3,8 +3,8 @@ package titans.nam.grib;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
-import titans.noaa.core.NoaaParameter;
 import titans.noaa.core.NoaaGribSource;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.grib.GribFile;
 
 /**
@@ -17,7 +17,6 @@ public class NamGribSource extends NoaaGribSource{
   
   /**
    * https://noaa-mrms-pds.s3.amazonaws.com/CONUS/BrightBandBottomHeight_00.00/20220722/MRMS_BrightBandBottomHeight_00.00_20220722-000000.grib2.gz
-   * @param filename
    * @return
    */
   @Override

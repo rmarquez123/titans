@@ -30,6 +30,9 @@ public class Cell {
     this.host = host;
     this.point = point;
     this.ij = ij;
+    if (this.point.getSRID() == 0) {
+      throw new RuntimeException("Invalid point, SRID = 0");
+    }
   }
 
   /**

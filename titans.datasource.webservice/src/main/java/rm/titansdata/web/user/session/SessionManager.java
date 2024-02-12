@@ -87,6 +87,15 @@ public class SessionManager implements ApplicationContextAware {
     String authToken = attr.getRequest().getHeader("AUTH-TOKEN");
     return authToken;
   }
+    
+  /**
+   * 
+   * @param authToken
+   * @return 
+   */
+  public boolean validAuthToken(String authToken) {
+    return this.authorized.containsValue(authToken);
+  }
   
   /**
    * 

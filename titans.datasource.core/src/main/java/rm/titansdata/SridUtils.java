@@ -32,6 +32,7 @@ public class SridUtils {
     CoordinateReferenceSystem targetCRS = getCrs(targetCRSCode);
     CoordinateTransform transform = ctFactory.createTransform(sourceCRS, targetCRS);
     Geometry result = transformGeometry(geometry, transform);
+    result.setSRID(targetSrid);
     return result;
   }
     
@@ -73,7 +74,9 @@ public class SridUtils {
    * @return
    */
   private static Geometry transformGeometry(Geometry geometry, CoordinateTransform transform) {
-    GeometryFactory factory = new GeometryFactory();
+    PrecisionModel precisionModel = new PrecisionModel(PrecisionModel.FLOATING);
+    int srid = Integer.parseInt(transform.getTargetCRS().getName().replace("EPSG:", ""));
+    GeometryFactory factory = new GeometryFactory(precisionModel, srid);
     if (geometry instanceof Point) {
       return transformPoint((Point) geometry, transform, factory);
     } else if (geometry instanceof LineString) {

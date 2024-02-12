@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  terrabyte-restapi:
+    container_name: terrabyte-restapi
+    build: .
+    ports:
+      - "8082:8080"
+
+
+networks:
+  default:
+    external:
+      name: pitch-network

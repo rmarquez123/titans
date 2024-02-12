@@ -46,4 +46,5 @@ public class SessionScopedBean<T> {
         String.format("Invalid token '%s'", authToken));   
     }
   }
+  
 }

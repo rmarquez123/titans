@@ -27,7 +27,13 @@ public abstract class NoaaGribSource {
     this.createGribFileParent(gribFile);
     GribFile result = gribFile;
     if (!gribFile.exists()) {
-      result = this.doDownload(gribUrl, gribFile);
+      try {
+        result = this.doDownload(gribUrl, gribFile);
+      } catch(Exception ex) {
+        String message = String.format(
+                "Error on downloading gribFile: %s, class: %s", gribFile, this.getClass());
+        throw new RuntimeException(message, ex);
+      }
     }
     return result;
   }

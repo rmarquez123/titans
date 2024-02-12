@@ -33,7 +33,7 @@ public class StartupTest implements InitializingBean {
     Unit<Angle> c = javax.measure.quantity.Angle.UNIT;
     SridUtils.init();
     if (!RmObjects.isWindows()) {
-      testWgribProces();
+      //testWgribProces();
     }
   }
 

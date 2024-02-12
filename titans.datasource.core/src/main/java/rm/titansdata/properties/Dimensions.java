@@ -5,6 +5,8 @@ import javax.measure.Measure;
 import javax.measure.quantity.Length;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
+import org.locationtech.jts.geom.Point;
+import rm.titansdata.SridUtils;
 
 /**
  *
@@ -20,17 +22,15 @@ public class Dimensions implements Serializable{
    * @return 
    */
   public static Dimensions create(Bounds bounds, Measure<Length> dx, Measure<Length> dy) {
-    int srid = bounds.getFactory().getSRID();
-    if (srid == 4326) {
-      throw new RuntimeException("Cannot calculate dimensions. The bounds are in srid = '4326'"); 
-    }
-    double pixelsx = ((bounds.getMaxX() - bounds.getMinX())/dx.doubleValue(SI.METRE));
-    double pixelsy = ((bounds.getMaxY() - bounds.getMinY())/dy.doubleValue(SI.METRE));
+    Point l = SridUtils.transform(bounds.lowerleft(), 3857);
+    Point u = SridUtils.transform(bounds.upperright(), 3857); 
+    Bounds boundsModified = Bounds.fromPoints(l, u);
+    double pixelsx = ((boundsModified.getMaxX() - boundsModified.getMinX())/dx.doubleValue(SI.METRE));
+    double pixelsy = ((boundsModified.getMaxY() - boundsModified.getMinY())/dy.doubleValue(SI.METRE));
     Dimension dimx = new Dimension(dx, (int) pixelsx);
     Dimension dimy = new Dimension(dy, (int) pixelsy);
     Dimensions result = new Dimensions(dimx, dimy); 
-    return result; 
-    
+    return result;
   }
   
   public final Dimension x;

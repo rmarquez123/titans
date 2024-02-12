@@ -26,7 +26,10 @@ public class RasterSearch {
   private final Dimensions dims;
 
   public RasterSearch(Bounds bounds, Dimensions dims) {
-    this.bounds = bounds;
+    int srid = 3857;
+    this.bounds = Bounds.fromPoints( //
+            SridUtils.transform(bounds.lowerleft(), srid),// 
+            SridUtils.transform(bounds.upperright(), srid));
     this.dims = dims;
   }
 
@@ -39,12 +42,13 @@ public class RasterSearch {
     double deltax = this.dims.getDeltaX(SI.METRE);
     double deltay = this.dims.getDeltaY(SI.METRE);
     double halfdeltax = 0.5 * deltax;
+    
     double maxX = this.bounds.getMaxX();
     double minX = this.bounds.getMinX();
     Stream.Builder<Pair<Integer, Cell>> builder = Stream.builder();
     int index = -1;
     int i = -1;
-    GeometryIntersectHelper helper = new GeometryIntersectHelper(bounds, null);
+    GeometryIntersectHelper helper = new GeometryIntersectHelper(this.bounds, null);
     double halfdeltay = 0.5 * deltay;
     double minY = this.bounds.getMinY();
     double maxY = this.bounds.getMaxY();
@@ -148,6 +152,7 @@ public class RasterSearch {
 
     private GeometryIntersectHelper(Bounds bounds, Geometry geometry) {
       this.bounds = bounds;
+      
       this.factory = this.bounds.getFactory();
       this.geometry = geometry;
       if (geometry != null) {
