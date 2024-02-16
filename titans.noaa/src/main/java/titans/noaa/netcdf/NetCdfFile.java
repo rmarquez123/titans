@@ -19,7 +19,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
-import rm.titansdata.SridUtils;
+import common.geom.SridUtils;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimension;
 import rm.titansdata.properties.Dimensions;

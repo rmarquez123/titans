@@ -28,7 +28,7 @@ import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.web.WebAppConfiguration;
 import rm.titansdata.Parameter;
-import rm.titansdata.SridUtils;
+import common.geom.SridUtils;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.raster.RasterCells;
 import rm.titansdata.web.JsonConverterUtil;

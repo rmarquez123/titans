@@ -5,7 +5,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import org.locationtech.jts.geom.Point;
-import rm.titansdata.SridUtils;
+import common.geom.SridUtils;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.raster.BasicRaster;

@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import rm.titansdata.SridUtils;
+import common.geom.SridUtils;
 
 /**
  *

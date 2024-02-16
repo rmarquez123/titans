@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import rm.titansdata.Parameter;
-import rm.titansdata.SridUtils;
+import common.geom.SridUtils;
 import rm.titansdata.colormap.ColorMap;
 import rm.titansdata.images.RasterImage;
 import rm.titansdata.plugin.ColorMapProvider;

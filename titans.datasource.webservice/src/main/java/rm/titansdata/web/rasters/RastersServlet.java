@@ -24,7 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import rm.titansdata.Parameter;
-import rm.titansdata.SridUtils;
+import common.geom.SridUtils;
 import rm.titansdata.plugin.ClassType;
 import rm.titansdata.plugin.Clazz;
 import rm.titansdata.properties.Bounds;

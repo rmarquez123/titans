@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.PrecisionModel;
-import rm.titansdata.SridUtils;
+import common.geom.SridUtils;
 
 /**
  *
