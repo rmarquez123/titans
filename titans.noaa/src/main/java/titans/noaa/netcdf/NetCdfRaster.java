@@ -1,11 +1,11 @@
 package titans.noaa.netcdf;
 
 import common.RmExceptions;
+import common.geom.SridUtils;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import org.locationtech.jts.geom.Point;
-import common.geom.SridUtils;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.raster.BasicRaster;
@@ -88,7 +88,7 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
   private int[] getQueryIndices(GridDatatype grid, Point argpoint) {
     Point point = SridUtils.transform(argpoint, 4326);
     GridCoordSystem gcs = grid.getCoordinateSystem();
-    double lat = point.getY();
+    double lat = point.getY();  
     double lon = point.getX();
     int[] xyIndex = gcs.findXYindexFromLatLon(lat, lon, null);
     return xyIndex;
