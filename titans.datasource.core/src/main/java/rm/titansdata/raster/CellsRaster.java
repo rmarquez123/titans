@@ -32,6 +32,9 @@ public class CellsRaster implements Raster {
     this.bounds = Objects.requireNonNull(bounds);
     this.dx = Objects.requireNonNull(dx);
     this.dy = Objects.requireNonNull(dy);
+    if (bounds.getFactory().getSRID() == 4326){
+      throw new UnsupportedOperationException("Wgs84 not supported");
+    }       
     double lengthX = bounds.getLengthX();
     this.Nx = Double.valueOf(lengthX / dx.doubleValue(SI.METRE)).intValue() - 1;
     double lengthY = bounds.getLengthY();
