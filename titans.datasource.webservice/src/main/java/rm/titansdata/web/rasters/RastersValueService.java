@@ -48,7 +48,10 @@ public class RastersValueService {
   /**
    *
    * @param rasterId
+   * @param projectId
+   * @param p
    * @param geometry
+   * @param bounds
    * @return
    */
   public RasterCells getRasterValues(Long rasterId, int projectId, // 

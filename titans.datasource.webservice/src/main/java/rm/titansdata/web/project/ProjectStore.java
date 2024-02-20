@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import common.db.DbConnection;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
 /**
@@ -54,6 +55,8 @@ public class ProjectStore {
   public void addProjectDataSources(int projectId, long[] rasterIds) {
     String statement = this.getAddProjectDataSourcesQuery(projectId, rasterIds);
     this.conn.executeStatement(statement);
+    GeometryFactory f;
+    
   }
 
   /**

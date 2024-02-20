@@ -1,6 +1,7 @@
 package rm.titansdata.web.rasters;
 
 import common.RmTimer;
+import common.geom.SridUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import rm.titansdata.Parameter;
-import common.geom.SridUtils;
 import rm.titansdata.plugin.ClassType;
 import rm.titansdata.plugin.Clazz;
 import rm.titansdata.properties.Bounds;
@@ -433,6 +433,7 @@ public class RastersServlet {
     String authToken = SessionManager.getSessionAuthToken();
     ProjectEntity project = this.projectEntity.getValue(authToken);
     Bounds result = project.getBounds();
+    result = result.transform(3857);
     return result;
   }
 

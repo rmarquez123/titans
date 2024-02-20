@@ -153,6 +153,8 @@ public class RastersSourceService {
       .setSourceDescription(RmDbUtils.stringValue(rs, "description"))
       .setDx(RmDbUtils.doubleValue(rs, "dx"))
       .setDy(RmDbUtils.doubleValue(rs, "dy"))
+      .setDx(3000d)
+      .setDy(3000d)
       .setLowerleft(RmDbUtils.pointValue(rs, "lowerleft", srid))
       .setUpperright(RmDbUtils.pointValue(rs, "upperright", srid))
       .build();
