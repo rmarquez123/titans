@@ -18,7 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.io.WKTReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -312,6 +315,44 @@ public class RastersServlet {
     map.put("values", s);
     this.responseHelper.send(map, res);
   }
+  
+  /**
+   * 
+   * @param req
+   * @param res 
+   */
+  @RequestMapping(
+          path = "/getRasterPointListValues",
+          params = {"rasterId", "points", "parameter", "srid"},
+          method = RequestMethod.GET)
+  public void getRasterPointListValues(HttpServletRequest req, HttpServletResponse res) {
+    RequestParser parser = new RequestParser(req);
+    long rasterId = parser.getLong("rasterId");
+    int srid = parser.getInteger("srid");
+    Map<Integer, Point> points = new HashMap<>();
+    try {
+      JSONArray pointsjson = new JSONArray(parser.getString("points"));
+      PrecisionModel.Type type = PrecisionModel.FLOATING;
+      GeometryFactory factory = new GeometryFactory(new PrecisionModel(type), srid);
+      WKTReader reader = new WKTReader(factory);
+      for (int i = 0; i < pointsjson.length(); i++) {
+        JSONObject p = pointsjson.getJSONObject(i);
+        int pointId = p.getInt("id");
+        Point point = (Point) reader.read(p.getString("point"));
+        points.put(pointId, point);
+      }
+    } catch(Exception ex) {
+      throw new RuntimeException(ex); 
+    }
+    JSONObject jsonObject = this.getParameterJson(parser);
+    Parameter param = this.parameterFactory.get(jsonObject);
+    Map<String, Object> map = new HashMap<>();
+    int projectId = this.getProjectId();
+    Map<Integer, Double> values = this.rastersValueService //
+            .getRasterValue(rasterId, projectId, param, points);
+    map.put("values", values);
+    this.responseHelper.send(map, res);
+  }
 
   /**
    *
@@ -390,10 +431,10 @@ public class RastersServlet {
     map.put("value", image);
     this.responseHelper.send(map, res);
   }
-  
+
   @Autowired
   private ImageDirectoryService directoryService;
-  
+
   /**
    *
    * @param req

@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Date;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -189,6 +190,11 @@ public class RequestParser {
     } catch(Exception ex) {
       throw new RuntimeException(ex);
     }
+  }
+
+  public List<Point> parseGeometries(String point, int srid) {
+    // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
 }

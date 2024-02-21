@@ -2,6 +2,7 @@ package rm.titansdata.web.rasters;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -88,10 +89,34 @@ public class RastersValueService {
     double result = rasterObj.getValue(point);
     return result;
   }
+  
+  /**
+   * 
+   * @param rasterId
+   * @param projectId
+   * @param p
+   * @param points
+   * @return 
+   */
+  public Map<Integer, Double> getRasterValue(Long rasterId, int projectId, Parameter p, Map<Integer, Point> points) {
+    RasterEntity rasterEntity = this.sourceService.getRaster(rasterId);
+    RasterObj rasterObj = this.getRasterObj(rasterEntity, rasterEntity.sourceTitle,  //
+      projectId, p, rasterEntity.getBounds());
+    Map<Integer, Double> result = new HashMap<>();
+    for ( Map.Entry<Integer, Point> entry : points.entrySet()) {
+      double r = rasterObj.getValue(entry.getValue());
+      result.put(entry.getKey(), r);
+    }
+    return result;
+  }
+  
 
   /**
    *
    * @param rasterId
+   * @param projectId
+   * @param p
+   * @param bounds
    * @return
    */
   public RasterObj getRasterObj(Long rasterId,  int projectId, Parameter p, Bounds bounds) {
