@@ -8,6 +8,8 @@ import javax.measure.quantity.Quantity;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Point;
 import rm.titansdata.properties.Bounds;
 
@@ -118,10 +120,29 @@ public class CellsRaster implements Raster {
     double result = count == 0 ? Double.NaN : sum / (double) count;
     return result;
   }
-
+  
+  /**
+   * 
+   * @param i
+   * @param j
+   * @return 
+   */
   private boolean isValidIndexRange(int i, int j) {
     boolean result = (0 <= i && i < this.Nx && 0 <= j && j < this.Ny);
     return result;
   }
 
+  @Override
+  public List<Point> getPoints(LineString string) {
+    // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+  
+  @Override
+  public List<Point> getPoints(LinearRing string) {
+    // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+  
+  
 }

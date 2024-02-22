@@ -1,8 +1,12 @@
 package rm.titansdata.raster;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Point;
 
 /**
@@ -42,7 +46,14 @@ public class NullRaster implements Raster {
   public double getMeanValue(Geometry envelope) {
     return Double.NaN;
   }
-  
-  
-  
+
+  @Override
+  public List<Point> getPoints(LineString string) {
+    return new ArrayList<>();
+  }
+
+  @Override
+  public List<Point> getPoints(LinearRing string) {
+    return new ArrayList<>(); 
+  }
 }

@@ -4,6 +4,8 @@ import java.util.List;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Point;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
@@ -76,6 +78,17 @@ public abstract class BasicRaster implements Raster {
     RasterSearch helper = new RasterSearch(bounds, dims);
     List<Cell> result = helper.getCells(envelope, this::getValue);
     return result;
+  }  
+
+  @Override
+  public List<Point> getPoints(LineString string) {
+    // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    throw new UnsupportedOperationException("Not supported yet.");
   }
   
+  @Override
+  public List<Point> getPoints(LinearRing string) {
+    // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 }

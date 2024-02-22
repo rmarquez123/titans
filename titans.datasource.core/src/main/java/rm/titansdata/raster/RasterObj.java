@@ -1,6 +1,7 @@
 package rm.titansdata.raster;
 
 import common.RmTimer;
+import common.geom.SridUtils;
 import java.util.List;
 import java.util.Objects;
 import javafx.util.Pair;
@@ -12,7 +13,6 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import common.geom.SridUtils;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.properties.Properties;
@@ -51,7 +51,8 @@ public class RasterObj {
    * @return
    */
   public double getValue(Point point) {
-    return this.raster.getValue(point);
+    double result = this.raster.getValue(point);
+    return result;
   }
 
   /**
