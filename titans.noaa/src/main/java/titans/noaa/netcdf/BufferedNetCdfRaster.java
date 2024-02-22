@@ -1,5 +1,8 @@
 package titans.noaa.netcdf;
 
+import java.util.List;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Point;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
@@ -28,5 +31,19 @@ public class BufferedNetCdfRaster extends BasicRaster {
     //To change body of generated methods, choose Tools | Templates.
     throw new UnsupportedOperationException("Not supported yet.");
   }
+
+  @Override
+  public List<Point> getPoints(LineString string) {
+    // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public List<Point> getPoints(LinearRing string) {
+    // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+  
+  
   
 }
