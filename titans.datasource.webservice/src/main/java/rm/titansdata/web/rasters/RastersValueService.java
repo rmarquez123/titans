@@ -42,10 +42,6 @@ public class RastersValueService {
     this.supplier = supplier;
   }
   
-  
-  
-  
-
   /**
    *
    * @param rasterId
@@ -88,6 +84,19 @@ public class RastersValueService {
       projectId, p, rasterEntity.getBounds()); 
     double result = rasterObj.getValue(point);
     return result;
+  }
+    
+  /**
+   * 
+   * @param rasterId
+   * @param projectId
+   * @param p
+   * @return 
+   */
+  public Raster getRaster(long rasterId, int projectId, Parameter p) {
+    RasterEntity entity = this.sourceService.getRaster(rasterId);
+    RasterObj object = this.getRasterObj(rasterId, projectId, p, entity.getBounds());
+    return object.getRaster();
   }
   
   /**

@@ -19,6 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.locationtech.jts.io.WKTReader;
@@ -31,6 +33,7 @@ import rm.titansdata.Parameter;
 import rm.titansdata.plugin.ClassType;
 import rm.titansdata.plugin.Clazz;
 import rm.titansdata.properties.Bounds;
+import rm.titansdata.raster.Raster;
 import rm.titansdata.raster.RasterCells;
 import rm.titansdata.web.JsonConverterUtil;
 import rm.titansdata.web.RequestParser;
@@ -315,11 +318,11 @@ public class RastersServlet {
     map.put("values", s);
     this.responseHelper.send(map, res);
   }
-  
+
   /**
-   * 
+   *
    * @param req
-   * @param res 
+   * @param res
    */
   @RequestMapping(
           path = "/getRasterPointListValues",
@@ -341,8 +344,8 @@ public class RastersServlet {
         Point point = (Point) reader.read(p.getString("point"));
         points.put(pointId, point);
       }
-    } catch(Exception ex) {
-      throw new RuntimeException(ex); 
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
     }
     JSONObject jsonObject = this.getParameterJson(parser);
     Parameter param = this.parameterFactory.get(jsonObject);
@@ -489,4 +492,35 @@ public class RastersServlet {
     return result;
   }
 
+  /**
+   *
+   * @param req
+   * @param res
+   */
+  @RequestMapping(
+          path = "/getRasterPoints",
+          params = {"rasterId", "geometry", "parameter", "srid"},
+          method = RequestMethod.GET
+  )
+  public void getRasterPoints(HttpServletRequest req, HttpServletResponse res) {
+    RequestParser parser = new RequestParser(req);
+    Long rasterId = parser.getLong("rasterId");
+    JSONObject jsonObject = this.getParameterJson(parser);
+    Parameter param = parameterFactory.get(jsonObject);
+    int projectId = this.getProjectId();
+    Raster s = this.rastersValueService.getRaster(rasterId, projectId, param);
+    List<Point> points;
+    int srid = parser.getInteger("srid");
+    Geometry geometry = parser.parseGeometry("geometry", srid);
+    if (geometry instanceof LinearRing) {
+      points = s.getPoints((LinearRing) geometry);
+    } else if (geometry instanceof LineString) {
+      points = s.getPoints((LineString) geometry);
+    } else {
+      throw new UnsupportedOperationException("Geometry is not a linear ring or line string");
+    }
+    Map<String, Object> map = new HashMap<>();
+    map.put("value", points);
+    this.responseHelper.send(map, res);
+  }
 }
