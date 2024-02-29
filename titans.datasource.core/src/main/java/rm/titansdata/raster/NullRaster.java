@@ -36,6 +36,17 @@ public class NullRaster implements Raster {
   public double getValue(Point point) {
     return Double.NaN;
   }
+
+  /**
+   * 
+   * @param point
+   * @return 
+   */
+  @Override
+  public double getValueNoCaching(Point point) {
+    return Double.NaN;
+  }
+  
   
   /**
    * 

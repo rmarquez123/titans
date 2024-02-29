@@ -44,7 +44,10 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
    */
   @Override
   public double getValue(Point point) {
-    double result = this.getValue(netCdfFile, point);
+    this.initGridDataset(netCdfFile);
+    GridDatatype grid = this.getGridDatatype(netCdfFile);
+    int[] xyIndex = this.getQueryIndices(grid, point);
+    double result = this.readCachedValueForIndices(grid, xyIndex);
     return result;
   }
 
@@ -53,7 +56,8 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
    * @param point
    * @return
    */
-  private double getValue(NetCdfFile netCdfFile, Point point) {
+  @Override
+  public double getValueNoCaching(Point point) {
     this.initGridDataset(netCdfFile);
     GridDatatype grid = this.getGridDatatype(netCdfFile);
     int[] xyIndex = this.getQueryIndices(grid, point);
@@ -85,6 +89,7 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
         throw new RuntimeException(ex);
       }
     }
+    
   }
 
   /**
@@ -145,7 +150,33 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
     double value;
     int xindex = xyIndex[0];
     int yindex = xyIndex[1];
-    Array array = this.getCache(grid, xyIndex);
+    Array array = this.getValueFromGrid(grid, xyIndex);
+    if (xindex == -1 || yindex == -1) {
+      value = Double.NaN;
+    } else {
+      if (array.getSize() > 1) {
+        int index = this.getOneDimensionIndex(grid, yindex, xindex);
+        value = array.getDouble(index);
+      } else {
+        value = array.getDouble(0);
+      }
+      return value;
+    }
+    return value;
+  }
+
+  /**
+   *
+   * @param grid
+   * @param xyIndex
+   * @return
+   * @throws IOException
+   */
+  private double readCachedValueForIndices(GridDatatype grid, int[] xyIndex) {
+    double value;
+    int xindex = xyIndex[0];
+    int yindex = xyIndex[1];
+    Array array = this.getFullValueArray(grid);
     if (xindex == -1 || yindex == -1) {
       value = Double.NaN;
     } else {
@@ -175,9 +206,28 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
    * @param xyIndex
    * @return
    */
-  private synchronized Array getCache(GridDatatype grid, int[] xyIndex) {
+  private synchronized Array getValueFromGrid(GridDatatype grid, int[] xyIndex) {
     int xindex = xyIndex[0];
     int yindex = xyIndex[1];
+    Array result;
+    try {
+      if (this.arr == null) {
+        this.arr = grid.readDataSlice(0, 0, yindex, xindex);
+      }
+      result = this.arr;
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+    return result;
+  }
+
+  /**
+   *
+   * @param grid
+   * @param xyIndex
+   * @return
+   */
+  private synchronized Array getFullValueArray(GridDatatype grid) {
     Array result;
     try {
       if (this.arr == null) {
@@ -226,7 +276,7 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
     List<Point> resultPoints = new ArrayList<>();
     GeometryFactory factory = RmObjects.getWgs84Factory(); // Assuming WGS 84 is the desired output CRS
     GridCoordSystem gcs = this.getCoordinateSystem(); // Retrieves the grid coordinate system
-      
+
     for (Coordinate coord : string.getCoordinates()) {
       // Transform the coordinate to the CRS of the grid if necessary
       Point point = RmObjects.createPoint(factory, coord.x, coord.y);

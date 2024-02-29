@@ -31,6 +31,13 @@ public interface Raster {
   
   /**
    * 
+   * @param point 
+   * @return  
+   */  
+  public double getValueNoCaching(Point point); 
+  
+  /**
+   * 
    * @param envelope
    * @return 
    */

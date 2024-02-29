@@ -15,46 +15,54 @@ import rm.titansdata.properties.Dimensions;
  * @author Ricardo Marquez
  */
 public abstract class BasicRaster implements Raster {
+
   private final Unit<? extends Quantity> units;
   private final Bounds bounds;
   private final Dimensions dims;
-  
-  
+
   /**
-   * 
+   *
    * @param units
    * @param bounds
-   * @param dims 
+   * @param dims
    */
   public BasicRaster(Unit<? extends Quantity> units, Bounds bounds, Dimensions dims) {
     this.units = units;
     this.bounds = bounds;
     this.dims = dims;
   }
-  
+
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
   @Override
   public Unit<? extends Quantity> getUnits() {
     return this.units;
   }
-  
-  
-  
+
   /**
-   * 
+   *
    * @param point
-   * @return 
+   * @return
    */
   @Override
-  public abstract double getValue(Point point); 
-    
+  public double getValueNoCaching(Point point) {
+    return this.getValue(point);
+  }
+
   /**
-   * 
+   *
+   * @param point
+   * @return
+   */
+  @Override
+  public abstract double getValue(Point point);
+
+  /**
+   *
    * @param envelope
-   * @return 
+   * @return
    */
   @Override
   public final double getMeanValue(Geometry envelope) {
@@ -63,29 +71,29 @@ public abstract class BasicRaster implements Raster {
     }
     List<Cell> cells = this.getCells(envelope);
     double result = cells.stream()
-      .mapToDouble(c->c.getValue())
-      .average()
-      .orElse(Double.NaN); 
+            .mapToDouble(c -> c.getValue())
+            .average()
+            .orElse(Double.NaN);
     return result;
   }
-  
+
   /**
-   * 
+   *
    * @param envelope
-   * @return 
+   * @return
    */
   private List<Cell> getCells(Geometry envelope) {
     RasterSearch helper = new RasterSearch(bounds, dims);
     List<Cell> result = helper.getCells(envelope, this::getValue);
     return result;
-  }  
+  }
 
   @Override
   public List<Point> getPoints(LineString string) {
     // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     throw new UnsupportedOperationException("Not supported yet.");
   }
-  
+
   @Override
   public List<Point> getPoints(LinearRing string) {
     // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody

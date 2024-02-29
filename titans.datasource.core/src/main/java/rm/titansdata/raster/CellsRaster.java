@@ -27,16 +27,16 @@ public class CellsRaster implements Raster {
   private final Unit<? extends Quantity> units;
 
   public CellsRaster(List<Cell> cells, //
-    Unit<? extends Quantity> units, Bounds bounds, // 
-    Measure<Length> dx, Measure<Length> dy) {
+          Unit<? extends Quantity> units, Bounds bounds, // 
+          Measure<Length> dx, Measure<Length> dy) {
     this.cells = cells;
     this.units = Objects.requireNonNull(units);
     this.bounds = Objects.requireNonNull(bounds);
     this.dx = Objects.requireNonNull(dx);
     this.dy = Objects.requireNonNull(dy);
-    if (bounds.getFactory().getSRID() == 4326){
+    if (bounds.getFactory().getSRID() == 4326) {
       throw new UnsupportedOperationException("Wgs84 not supported");
-    }       
+    }
     double lengthX = bounds.getLengthX();
     this.Nx = Double.valueOf(lengthX / dx.doubleValue(SI.METRE)).intValue() - 1;
     double lengthY = bounds.getLengthY();
@@ -74,6 +74,21 @@ public class CellsRaster implements Raster {
    */
   @Override
   public double getValue(Point point) {
+    double minX = bounds.getMinX();
+    double minY = bounds.getMinY();
+    int i = Double.valueOf((point.getX() - minX) / dx.doubleValue(SI.METRE)).intValue();
+    int j = Double.valueOf((point.getY() - minY) / dy.doubleValue(SI.METRE)).intValue();
+    double result = this.getValue(i, j);
+    return result;
+  } 
+  
+  /**
+   * 
+   * @param point
+   * @return 
+   */
+  @Override
+  public double getValueNoCaching(Point point) {
     double minX = bounds.getMinX();
     double minY = bounds.getMinY();
     int i = Double.valueOf((point.getX() - minX) / dx.doubleValue(SI.METRE)).intValue();
@@ -120,12 +135,12 @@ public class CellsRaster implements Raster {
     double result = count == 0 ? Double.NaN : sum / (double) count;
     return result;
   }
-  
+
   /**
-   * 
+   *
    * @param i
    * @param j
-   * @return 
+   * @return
    */
   private boolean isValidIndexRange(int i, int j) {
     boolean result = (0 <= i && i < this.Nx && 0 <= j && j < this.Ny);
@@ -137,12 +152,11 @@ public class CellsRaster implements Raster {
     // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     throw new UnsupportedOperationException("Not supported yet.");
   }
-  
+
   @Override
   public List<Point> getPoints(LinearRing string) {
     // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     throw new UnsupportedOperationException("Not supported yet.");
   }
-  
-  
+
 }

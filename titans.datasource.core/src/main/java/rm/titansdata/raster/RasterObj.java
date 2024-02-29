@@ -54,6 +54,17 @@ public class RasterObj {
     double result = this.raster.getValue(point);
     return result;
   }
+  
+  
+  /**
+   * 
+   * @param point
+   * @return 
+   */
+  public double getValueNoCaching(Point point) {
+    double result = this.raster.getValue(point);
+    return result;
+  }
 
   /**
    *

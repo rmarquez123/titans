@@ -332,6 +332,25 @@ public class RastersServlet {
     RequestParser parser = new RequestParser(req);
     long rasterId = parser.getLong("rasterId");
     int srid = parser.getInteger("srid");
+    Map<Integer, Point> points = parseParameterPoints(parser, srid);
+    JSONObject jsonObject = this.getParameterJson(parser);
+    Parameter param = this.parameterFactory.get(jsonObject);
+    Map<String, Object> map = new HashMap<>(); 
+    int projectId = this.getProjectId();
+    Map<Integer, Double> values = this.rastersValueService //
+            .getRasterValue(rasterId, projectId, param, points);
+    map.put("values", values);
+    this.responseHelper.send(map, res);
+  }
+  
+  /**
+   * 
+   * @param parser
+   * @param srid
+   * @return
+   * @throws RuntimeException 
+   */
+  private Map<Integer, Point> parseParameterPoints(RequestParser parser, int srid)  {
     Map<Integer, Point> points = new HashMap<>();
     try {
       JSONArray pointsjson = new JSONArray(parser.getString("points"));
@@ -347,14 +366,7 @@ public class RastersServlet {
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
-    JSONObject jsonObject = this.getParameterJson(parser);
-    Parameter param = this.parameterFactory.get(jsonObject);
-    Map<String, Object> map = new HashMap<>();
-    int projectId = this.getProjectId();
-    Map<Integer, Double> values = this.rastersValueService //
-            .getRasterValue(rasterId, projectId, param, points);
-    map.put("values", values);
-    this.responseHelper.send(map, res);
+    return points;
   }
 
   /**

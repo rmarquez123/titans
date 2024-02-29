@@ -1,5 +1,6 @@
 package rm.titansdata.web.rasters;
 
+import common.RmTimer;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
@@ -31,17 +32,17 @@ public class RastersValueService {
   private final RasterFactorySupplier supplier;
 
   /**
-   * 
+   *
    * @param sourceService
-   * @param supplier 
+   * @param supplier
    */
   public RastersValueService( //
-    @Autowired RastersSourceService sourceService, //
-    @Autowired RasterFactorySupplier supplier) {
+          @Autowired RastersSourceService sourceService, //
+          @Autowired RasterFactorySupplier supplier) {
     this.sourceService = sourceService;
     this.supplier = supplier;
   }
-  
+
   /**
    *
    * @param rasterId
@@ -52,10 +53,10 @@ public class RastersValueService {
    * @return
    */
   public RasterCells getRasterValues(Long rasterId, int projectId, // 
-    Parameter p, Geometry geometry, Bounds bounds) {
+          Parameter p, Geometry geometry, Bounds bounds) {
     RasterEntity rasterEntity = this.sourceService.getRaster(rasterId);
     String sourceTitle = rasterEntity.sourceTitle;
-    RasterObj rasterObj = this.getRasterObj(rasterEntity, sourceTitle, projectId, p, bounds); 
+    RasterObj rasterObj = this.getRasterObj(rasterEntity, sourceTitle, projectId, p, bounds);
     if (geometry.getGeometryType().equals("Point")) {
       throw new RuntimeException("Does not support 'Point' geometry type");
     }
@@ -70,55 +71,60 @@ public class RastersValueService {
     RasterCells result = subset.interleave();
     return result;
   }
-  
+
   /**
-   * 
+   *
    * @param rasterId
    * @param p
    * @param point
-   * @return 
+   * @return
    */
   double getRasterValue(Long rasterId, int projectId, Parameter p, Point point) {
     RasterEntity rasterEntity = this.sourceService.getRaster(rasterId);
-    RasterObj rasterObj = this.getRasterObj(rasterEntity, rasterEntity.sourceTitle,  //
-      projectId, p, rasterEntity.getBounds()); 
+    RasterObj rasterObj = this.getRasterObj(rasterEntity, rasterEntity.sourceTitle, //
+            projectId, p, rasterEntity.getBounds());
     double result = rasterObj.getValue(point);
     return result;
   }
-    
+
   /**
-   * 
+   *
    * @param rasterId
    * @param projectId
    * @param p
-   * @return 
+   * @return
    */
   public Raster getRaster(long rasterId, int projectId, Parameter p) {
     RasterEntity entity = this.sourceService.getRaster(rasterId);
     RasterObj object = this.getRasterObj(rasterId, projectId, p, entity.getBounds());
     return object.getRaster();
   }
-  
+
   /**
-   * 
+   *
    * @param rasterId
    * @param projectId
-   * @param p
+   * @param parameter
    * @param points
-   * @return 
+   * @return
    */
-  public Map<Integer, Double> getRasterValue(Long rasterId, int projectId, Parameter p, Map<Integer, Point> points) {
+  public Map<Integer, Double> getRasterValue(Long rasterId, int projectId, Parameter parameter, Map<Integer, Point> points) {
     RasterEntity rasterEntity = this.sourceService.getRaster(rasterId);
-    RasterObj rasterObj = this.getRasterObj(rasterEntity, rasterEntity.sourceTitle,  //
-      projectId, p, rasterEntity.getBounds());
+    Bounds bounds = rasterEntity.getBounds();
+    
+    RasterObj rasterObj = this.getRasterObj( //
+            rasterEntity, rasterEntity.sourceTitle, //
+            projectId, parameter, bounds);
+    
     Map<Integer, Double> result = new HashMap<>();
-    for ( Map.Entry<Integer, Point> entry : points.entrySet()) {
+    for (Map.Entry<Integer, Point> entry : points.entrySet()) {
+      RmTimer timer = RmTimer.start();
       double r = rasterObj.getValue(entry.getValue());
       result.put(entry.getKey(), r);
+      timer.endAndPrint();
     }
     return result;
   }
-  
 
   /**
    *
@@ -128,13 +134,12 @@ public class RastersValueService {
    * @param bounds
    * @return
    */
-  public RasterObj getRasterObj(Long rasterId,  int projectId, Parameter p, Bounds bounds) {
+  public RasterObj getRasterObj(Long rasterId, int projectId, Parameter p, Bounds bounds) {
     RasterEntity rasterEntity = this.sourceService.getRaster(rasterId);
     String sourceTitle = rasterEntity.sourceTitle;
     RasterObj result = this.getRasterObj(rasterEntity, sourceTitle, projectId, p, bounds);
     return result;
   }
-
 
   /**
    *
@@ -143,15 +148,15 @@ public class RastersValueService {
    * @return
    */
   private RasterObj getRasterObj(RasterEntity rasterEntity, String key, int projectId, // 
-    Parameter p, Bounds bounds) {
+          Parameter p, Bounds bounds) {
     Dimensions dims = rasterEntity.getDimensions();
     long typeId = rasterEntity.rasterTypeId;
     Raster raster = this.supplier.builder()
-      .setTypeId(typeId)
-      .setSourceTitle(key)
-      .setBounds(bounds)
-      .setDimensions(dims)
-      .createRaster(projectId, p);
+            .setTypeId(typeId)
+            .setSourceTitle(key)
+            .setBounds(bounds)
+            .setDimensions(dims)
+            .createRaster(projectId, p);
     Properties properties = new Properties(bounds, dims.x.length, dims.y.length);
     RasterObj rasterObj = new RasterObj(key, properties, raster);
     return rasterObj;
@@ -165,10 +170,10 @@ public class RastersValueService {
    * @return
    */
   Map<Parameter, Double> getPointRasterValues( //
-    long rasterId, int projectId,  List<Parameter> parameters, Point point) {
+          long rasterId, int projectId, List<Parameter> parameters, Point point) {
     Map<Parameter, Double> result = parameters.stream()
-      .map(param -> Pair.create(param, this.getRasterValue(rasterId, projectId, param, point)))
-      .collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue()));
+            .map(param -> Pair.create(param, this.getRasterValue(rasterId, projectId, param, point)))
+            .collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue()));
     return result;
   }
 }
