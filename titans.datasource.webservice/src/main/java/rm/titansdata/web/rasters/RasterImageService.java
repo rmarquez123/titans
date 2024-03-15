@@ -1,5 +1,6 @@
 package rm.titansdata.web.rasters;
 
+import common.geom.SridUtils;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
@@ -10,7 +11,6 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import rm.titansdata.Parameter;
-import common.geom.SridUtils;
 import rm.titansdata.colormap.ColorMap;
 import rm.titansdata.images.RasterImage;
 import rm.titansdata.plugin.ColorMapProvider;
@@ -107,7 +107,6 @@ public class RasterImageService {
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
-    this.servletContext.getContextPath();
     String externalUrl = this.imageDirectory.getExternalUrl();
     String result = externalUrl + File.separator + "data?code=" + imageFile.getName();
     return result;

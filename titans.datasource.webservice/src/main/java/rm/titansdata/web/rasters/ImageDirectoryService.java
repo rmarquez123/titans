@@ -47,7 +47,11 @@ public class ImageDirectoryService implements InitializingBean{
     RmObjects.createDirectoryIfDoesNotExist(imageFile.getParentFile());
     return imageFile;
   }
-
+  
+  /**
+   * 
+   * @return 
+   */
   private File getRelativePath() {
     String relativePathString = appProps.getProperty("imagedatapath");
     File relativePath = new File(relativePathString);
