@@ -32,7 +32,6 @@ public class RasterImageServiceIT extends BaseSpringTest {
    * 
    * @param rasterId
    * @param parentKey
-   * @param a 
    */
   @Test
   @Parameters({

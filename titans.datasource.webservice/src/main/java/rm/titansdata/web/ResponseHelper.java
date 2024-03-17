@@ -51,7 +51,8 @@ public class ResponseHelper {
 
   /**
    *
-   */
+   * @param result
+   * @param response */
   public void sendAsZippedFile(String result, HttpServletResponse response) {
     response.setContentType("application/zip");
     String filename = "sampleZip.zip";

@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.raster.BasicRaster;
@@ -332,25 +333,26 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
    */
   @Override
   public List<Point> getPoints(LinearRing linearRingArg) {
-    if (linearRingArg.isClosed()) {
+    if (!linearRingArg.isClosed()) {
       throw new RuntimeException("Linear ring must be closed.");
     }
     List<Point> resultPoints = new ArrayList<>();
     int wgs = 4326;
-    LinearRing linearRing = (LinearRing) SridUtils.transform(linearRingArg, wgs);
+    LinearRing linearRing = SridUtils.transform(linearRingArg, wgs);
     Envelope envelope = linearRing.getEnvelopeInternal();
     GeometryFactory factory = RmObjects.getWgs84Factory();
     GridCoordSystem gcs = this.getCoordinateSystem();
     int[] minIndex = gcs.findXYindexFromLatLon(envelope.getMinY(), envelope.getMinX(), null);
     int[] maxIndex = gcs.findXYindexFromLatLon(envelope.getMaxY(), envelope.getMaxX(), null);
 
+    Polygon polygon = factory.createPolygon(linearRing);
     for (int xIndex = minIndex[0]; xIndex <= maxIndex[0]; xIndex++) {
       for (int yIndex = minIndex[1]; yIndex <= maxIndex[1]; yIndex++) {
         LatLonPoint latLon = gcs.getLatLon(xIndex, yIndex);
         double lon = latLon.getLongitude();
         double lat = latLon.getLatitude();
         Point gridPoint = RmObjects.createPoint(factory, lon, lat);
-        if (linearRing.contains(gridPoint)) {
+        if (polygon.covers(gridPoint)) {
           resultPoints.add(gridPoint);
         }
       }

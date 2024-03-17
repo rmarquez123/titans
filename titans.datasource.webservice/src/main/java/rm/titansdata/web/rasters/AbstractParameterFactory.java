@@ -45,7 +45,7 @@ public class AbstractParameterFactory {
 
   /**
    *
-   * @param string
+   * @param parameter
    * @return
    */
   public Parameter get(JSONObject parameter) {

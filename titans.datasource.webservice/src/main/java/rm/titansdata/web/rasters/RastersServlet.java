@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,6 +204,11 @@ public class RastersServlet {
     this.responseHelper.send(map, res);
   }
 
+  /**
+   *
+   * @param req
+   * @param res
+   */
   @RequestMapping(path = "/getRastersByGroupId",
           params = "rasterGroupId",
           method = RequestMethod.GET)
@@ -215,6 +221,11 @@ public class RastersServlet {
     this.responseHelper.send(map, res);
   }
 
+  /**
+   *
+   * @param req
+   * @param res
+   */
   @RequestMapping(
           path = "/getRasterValues",
           params = {"rasterId", "geometry", "parameter", "srid"}, method = RequestMethod.GET)
@@ -236,6 +247,69 @@ public class RastersServlet {
     String result = JsonConverterUtil.toJson(values);
     this.responseHelper.sendAsZippedFile(result, res);
     timer.endAndPrint("sending");
+  }
+
+  /**
+   *
+   * @param req
+   * @param res
+   */
+  @RequestMapping(
+          path = "/getBaseRasterValues",
+          params = {"rasterId", "geometry", "parameters", "srid"}, method = RequestMethod.GET)
+  public void getBaseRasterValues(HttpServletRequest req, HttpServletResponse res) {
+    RequestParser parser = new RequestParser(req);
+    Long rasterId = parser.getLong("rasterId");
+    int srid = parser.getInteger("srid");
+    Geometry geometry = parser.parseGeometry("geometry", srid);
+    JSONArray jsonArr = this.getParametersJsonArray(parser);
+    List<Parameter> params = new ArrayList<>();
+    for (int i = 0; i < jsonArr.length(); i++) {
+      try {
+        JSONObject jsonObject = jsonArr.getJSONObject(i);
+        Parameter param = parameterFactory.get(jsonObject);
+        params.add(param);
+      } catch(Exception ex) {
+        throw new RuntimeException(ex);
+      }
+    }
+    int projectId = this.getProjectId();
+    geometry.getSRID();
+    Parameter firstParam = params.get(0);
+    List<Point> points = this.getRasterPoints(rasterId, projectId, firstParam, geometry);
+    Map<Integer, Point> ps = new HashMap<>(points.size());
+    for (int i = 0; i < points.size(); i++) {
+      ps.put(i, points.get(i));
+    }
+    Map<Integer, PointValues> pointValues = new HashMap<>(points.size());
+    for (int paramIndex = 0; paramIndex < params.size(); paramIndex++) {
+      Parameter param = params.get(paramIndex);
+      Map<Integer, Double> values = this.rastersValueService //
+              .getRasterValue(rasterId, projectId, param, ps);
+      
+      for (Map.Entry<Integer, Double> entry : values.entrySet()) {
+        Integer pointIndex = entry.getKey();
+        if (paramIndex == 0) {
+          Point point = ps.get(pointIndex);
+          pointValues.putIfAbsent(pointIndex, new PointValues(point));
+        }
+        pointValues.get(pointIndex).values.add(entry.getValue());
+      }
+    }
+    RmTimer timer = RmTimer.start();
+    String result = JsonConverterUtil.toJson(pointValues);
+    this.responseHelper.sendAsZippedFile(result, res);
+    timer.endAndPrint("sending");
+  }
+
+  public static class PointValues {
+
+    final Point point;
+    final List<Double> values = new ArrayList<>();
+
+    public PointValues(Point point) {
+      this.point = point;
+    }
   }
 
   /**
@@ -335,22 +409,22 @@ public class RastersServlet {
     Map<Integer, Point> points = parseParameterPoints(parser, srid);
     JSONObject jsonObject = this.getParameterJson(parser);
     Parameter param = this.parameterFactory.get(jsonObject);
-    Map<String, Object> map = new HashMap<>(); 
+    Map<String, Object> map = new HashMap<>();
     int projectId = this.getProjectId();
     Map<Integer, Double> values = this.rastersValueService //
             .getRasterValue(rasterId, projectId, param, points);
     map.put("values", values);
     this.responseHelper.send(map, res);
   }
-  
+
   /**
-   * 
+   *
    * @param parser
    * @param srid
    * @return
-   * @throws RuntimeException 
+   * @throws RuntimeException
    */
-  private Map<Integer, Point> parseParameterPoints(RequestParser parser, int srid)  {
+  private Map<Integer, Point> parseParameterPoints(RequestParser parser, int srid) {
     Map<Integer, Point> points = new HashMap<>();
     try {
       JSONArray pointsjson = new JSONArray(parser.getString("points"));
@@ -520,10 +594,17 @@ public class RastersServlet {
     JSONObject jsonObject = this.getParameterJson(parser);
     Parameter param = parameterFactory.get(jsonObject);
     int projectId = this.getProjectId();
-    Raster s = this.rastersValueService.getRaster(rasterId, projectId, param);
-    List<Point> points;
     int srid = parser.getInteger("srid");
     Geometry geometry = parser.parseGeometry("geometry", srid);
+    List<Point> points = this.getRasterPoints(rasterId, projectId, param, geometry);
+    Map<String, Object> map = new HashMap<>();
+    map.put("value", points);
+    this.responseHelper.send(map, res);
+  }
+
+  private List<Point> getRasterPoints(Long rasterId, int projectId, Parameter param, Geometry geometry) {
+    Raster s = this.rastersValueService.getRaster(rasterId, projectId, param);
+    List<Point> points;
     if (geometry instanceof LinearRing) {
       points = s.getPoints((LinearRing) geometry);
     } else if (geometry instanceof LineString) {
@@ -531,8 +612,6 @@ public class RastersServlet {
     } else {
       throw new UnsupportedOperationException("Geometry is not a linear ring or line string");
     }
-    Map<String, Object> map = new HashMap<>();
-    map.put("value", points);
-    this.responseHelper.send(map, res);
+    return points;
   }
 }

@@ -51,6 +51,9 @@ public class RasterObj {
    * @return
    */
   public double getValue(Point point) {
+    if (point == null) {
+      throw new RuntimeException("Point cannot be null");
+    }
     double result = this.raster.getValue(point);
     return result;
   }

@@ -1,6 +1,5 @@
 package rm.titansdata.web.rasters;
 
-import common.RmTimer;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.HashMap;
@@ -115,13 +114,10 @@ public class RastersValueService {
     RasterObj rasterObj = this.getRasterObj( //
             rasterEntity, rasterEntity.sourceTitle, //
             projectId, parameter, bounds);
-    
     Map<Integer, Double> result = new HashMap<>();
     for (Map.Entry<Integer, Point> entry : points.entrySet()) {
-      RmTimer timer = RmTimer.start();
       double r = rasterObj.getValue(entry.getValue());
       result.put(entry.getKey(), r);
-      timer.endAndPrint();
     }
     return result;
   }
