@@ -49,7 +49,7 @@ public class ColorMapProviderFactory {
     if (providers.containsKey(rasterId)) {   
       result = this.providers.get(rasterId);   
     } else {
-      result = (int projectId1, Parameter param) -> defaultColorMap(rasterId, projectId1, param);
+      result = (int projectId1, String colorMap, Parameter param) -> defaultColorMap(rasterId, projectId1, param, colorMap);
     }
     return result;   
   }
@@ -59,9 +59,10 @@ public class ColorMapProviderFactory {
    * @param rasterId
    * @param projectId
    * @param param
+   * @param colorMap
    * @return 
    */
-  public ColorMap defaultColorMap(long rasterId, int projectId, Parameter param) {
+  public ColorMap defaultColorMap(long rasterId, int projectId, Parameter param, String colorMap) {
     Bounds bounds = this.sourceService.getRaster(rasterId).getBounds();
     RasterObj r = this.rastersValueService.getRasterObj(rasterId, projectId, param, bounds);
     RasterSearch s = new RasterSearch(r.getBounds(), r.getDimensions());
@@ -76,7 +77,7 @@ public class ColorMapProviderFactory {
     ColorMap cmap = new ColorMap.Builder()
       .setXmin(min)
       .setXmax(max)
-      .setColorMapName("Viridis")
+      .setColorMapName(colorMap)
       .build();
     return cmap;
   }

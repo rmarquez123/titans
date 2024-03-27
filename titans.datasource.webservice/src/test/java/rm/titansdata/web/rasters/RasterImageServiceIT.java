@@ -52,7 +52,8 @@ public class RasterImageServiceIT extends BaseSpringTest {
     Coordinate p2 = new Coordinate(p1.x + 0.1, p1.y + 0.1);
     Bounds bounds = Bounds.fromPoints(p1, p2, 4326).transform(32610);
     int projectId = 0;
-    RasterImageResult img = this.imageService.getRasterImage(rasterId, projectId, param, bounds); 
+    String colorMap = "Viridis";
+    RasterImageResult img = this.imageService.getRasterImage(rasterId, projectId, param, bounds, colorMap); 
     System.out.println("img = " + img);
   }
 }

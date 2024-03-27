@@ -490,8 +490,9 @@ public class RastersServlet {
     Parameter param = new NoaaParameter(parentKey, datetime, 0, noaaVar, Unit.ONE);
     Bounds bounds = this.getBoundsFromProject();
     int projectId = this.getProjectId();
+    String colorMap = "Viridis";
     RasterImageResult image = this.rastersImageService.getRasterImage( //
-            rasterId, projectId, param, bounds);
+            rasterId, projectId, param, bounds, colorMap);
     Map<String, Object> map = new HashMap<>();
     map.put("value", image);
     this.responseHelper.send(map, res);
@@ -504,7 +505,7 @@ public class RastersServlet {
    */
   @RequestMapping(
           path = "/getRasterImage",
-          params = {"rasterId", "parameter"},
+          params = {"rasterId", "parameter", "colorMap"},
           method = RequestMethod.GET
   )
   public void getRasterImage(HttpServletRequest req, HttpServletResponse res) {
@@ -514,8 +515,9 @@ public class RastersServlet {
     Parameter param = parameterFactory.get(jsonObject);
     Bounds bounds = this.getBoundsFromProject();
     int projectId = this.getProjectId();
-    RasterImageResult image = this.rastersImageService.getRasterImage( //
-            rasterId, projectId, param, bounds);
+    String colorMap = parser.getString("colorMap"); 
+    RasterImageResult image = this.rastersImageService.getRasterImage//
+        (rasterId, projectId, param, bounds, colorMap);
     Map<String, Object> map = new HashMap<>();
     map.put("value", image);
     this.responseHelper.send(map, res);
