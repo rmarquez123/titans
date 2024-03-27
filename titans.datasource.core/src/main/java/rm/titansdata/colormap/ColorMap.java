@@ -93,6 +93,7 @@ public class ColorMap {
    * @return 
    */
   private Color getColor(double value) {
+    
     Colormap get = Colormaps.get(this.colorMapName);
     FluidColormap maps = Colormaps.fluidColormap(get, (float) this.xmin, (float) this.xmax, false);
     Color color = maps.get(value);
