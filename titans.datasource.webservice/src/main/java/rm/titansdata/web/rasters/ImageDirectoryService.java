@@ -1,5 +1,6 @@
 package rm.titansdata.web.rasters;
 
+import common.RmExceptions;
 import common.RmKeys;
 import common.RmObjects;
 import java.io.File;
@@ -66,6 +67,9 @@ public class ImageDirectoryService implements InitializingBean{
   public File getImageFile(String code) {
     File relativePath = this.getRelativePath();
     File file = new File(relativePath, code);
+    if (!file.exists()) {
+      throw RmExceptions.create("File for code '%s' doesn't exist", code);
+    }
     return file;
   }
   
