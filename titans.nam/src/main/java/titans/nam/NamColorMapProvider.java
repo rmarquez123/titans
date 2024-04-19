@@ -32,10 +32,10 @@ public class NamColorMapProvider implements ColorMapProvider {
   
 
   @Override
-  public ColorMap getColorMap(int projectId, Parameter param) {
+  public ColorMap getColorMap(int projectId, String colorMapName, Parameter param) {
     ColorMap result; 
     if (param instanceof NoaaParameter) {
-      result = this.getColorMapFromFile(projectId, (NoaaParameter) param);
+      result = this.getColorMapFromFile(projectId, (NoaaParameter) param, colorMapName);
     } else {
       throw new RuntimeException();
     }
@@ -47,13 +47,13 @@ public class NamColorMapProvider implements ColorMapProvider {
    * @param namParameter
    * @return 
    */
-  private ColorMap getColorMapFromFile(int projectId, NoaaParameter namParameter) {
+  private ColorMap getColorMapFromFile(int projectId, NoaaParameter namParameter, String colorMapName) {
     NetCdfFile f = NetCdfFile.create(this.baseNetCdfdir, projectId,  namParameter);
     DoubleRange r= f.getValueRange();
     ColorMap result = new ColorMap.Builder()
       .setXmin(r.getMinimumDouble())
       .setXmax(r.getMaximumDouble())
-      .setColorMapName("Viridis")
+      .setColorMapName(colorMapName)
       .build();
     return result;
   }
