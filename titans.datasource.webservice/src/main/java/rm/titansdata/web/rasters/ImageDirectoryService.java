@@ -25,14 +25,14 @@ public class ImageDirectoryService implements InitializingBean{
    * 
    * @throws Exception 
    */
-  @Override
-  public void afterPropertiesSet() throws Exception {
+  @Override  
+  public void afterPropertiesSet() throws Exception {   
     if (!this.appProps.containsKey("imagedatapath")) {
       throw new RuntimeException("'imagedatapath' is not defined"); 
-    }
+    }    
     if (!this.appProps.containsKey("imagedatapath_external_url")) {
       throw new RuntimeException("'imagedatapath_external_url' is not defined"); 
-    }
+    }           
   }
   
     

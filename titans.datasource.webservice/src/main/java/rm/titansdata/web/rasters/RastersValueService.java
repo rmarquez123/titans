@@ -2,6 +2,7 @@ package rm.titansdata.web.rasters;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,5 +172,14 @@ public class RastersValueService {
             .map(param -> Pair.create(param, this.getRasterValue(rasterId, projectId, param, point)))
             .collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue()));
     return result;
+  }
+  
+  /**
+   * 
+   * @param dateTime 
+   */
+  void deleteStoredFilesBefore(int projectId, ZonedDateTime dateTime) {
+    this.supplier.deleteStoredFilesBefore(projectId, dateTime);
+            
   }
 }

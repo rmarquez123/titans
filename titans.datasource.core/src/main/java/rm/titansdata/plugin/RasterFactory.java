@@ -1,5 +1,6 @@
 package rm.titansdata.plugin;
 
+import java.time.ZonedDateTime;
 import rm.titansdata.Parameter;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
@@ -26,4 +27,12 @@ public interface RasterFactory {
    * @see Raster
    */
   public Raster create(int projectId, Parameter param, Bounds bounds, Dimensions dims); 
+  
+  /**
+   * 
+   * @param projectId
+   * @param dateTime 
+   */
+  public void deleteStoredFilesBefore(int projectId, ZonedDateTime dateTime);
+  
 }

@@ -14,7 +14,7 @@ import rm.titansdata.raster.RasterObj;
  * @author Ricardo Marquez
  */
 public abstract class NoaaRasterFactory implements RasterFactory {
-  
+
   /**
    *
    * @param projectId
@@ -42,12 +42,24 @@ public abstract class NoaaRasterFactory implements RasterFactory {
   }
 
   /**
-   * An importer is needed to download data from external sources. 
-   * The importer is responsible for downloading and storing data on the local server. 
-   * The project id can be used for miscellaneous information such as the valid bounds 
-   * and dimensions. 
+   * An importer is needed to download data from external sources. The importer
+   * is responsible for downloading and storing data on the local server. The
+   * project id can be used for miscellaneous information such as the valid
+   * bounds and dimensions.
+   *
    * @param projectId
    * @return
    */
   protected abstract NoaaImporter getImporter(int projectId);
+
+  /**
+   * 
+   * @param projectId
+   * @param dateTime 
+   */
+  @Override
+  public final void deleteStoredFilesBefore(int projectId, ZonedDateTime dateTime) {
+    NoaaImporter importer = this.getImporter(projectId);
+    importer.removeRastersBefore(dateTime);
+  }
 }

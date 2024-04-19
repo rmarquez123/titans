@@ -20,12 +20,11 @@ public class HrrrArchiveRasterFactory extends NoaaRasterFactory {
           @Qualifier("netCdfRootFolder") File netCdfRootFolder,
           @Qualifier("degribExe") File degribExe) {
     this.hrrrImporterBuilder = new HrrrArchiveImporter.Builder()
-            .setDegribExe(degribExe)
+            .setDegribExe(degribExe)  
             .setGribRootFolder(new File(gribRootFolder, "hrrr.archive"))
             .setNetCdfRootFolder(new File(netCdfRootFolder, "hrrr.archive"));
-
   }
-
+ 
   /**
    *
    * @return
@@ -45,4 +44,6 @@ public class HrrrArchiveRasterFactory extends NoaaRasterFactory {
   protected NoaaGribImporter getImporter(int projectId) {
     return this.hrrrImporterBuilder.setSubfolderId(projectId).build();
   }
+  
+  
 }

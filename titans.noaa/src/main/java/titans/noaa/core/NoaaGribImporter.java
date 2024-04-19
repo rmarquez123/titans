@@ -1,7 +1,12 @@
 package titans.noaa.core;
 
+import com.google.common.collect.TreeTraverser;
+import com.google.common.io.Files;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.raster.RasterObj;
@@ -15,7 +20,7 @@ import titans.noaa.netcdf.NetCdfRasterProvider;
  * @author Ricardo Marquez
  */
 public abstract class NoaaGribImporter implements NoaaImporter {
-  
+
   private final NetCdfRasterProvider rasterLoader = new NetCdfRasterProvider();
   private final File gribRootFolder;
   private final File netCdfRootFolder;
@@ -35,21 +40,21 @@ public abstract class NoaaGribImporter implements NoaaImporter {
     this.subfolderId = subfolderId;
     this.degribExe = degribExe;
   }
-  
+
   /**
-   * 
+   *
    * @param var
    * @param datetime
    * @param fcststep
    * @param bounds
    * @param dims
-   * @return 
+   * @return
    */
   @Override
   public final RasterObj getRaster(NoaaVariable var, // 
-    ZonedDateTime datetime, int fcststep, Bounds bounds, Dimensions dims) {
+          ZonedDateTime datetime, int fcststep, Bounds bounds, Dimensions dims) {
     NetCdfFile netCdfFile;
-    NetCdfExtractor extractor = new NetCdfExtractor(this.degribExe, this.netCdfRootFolder, this.subfolderId, var); 
+    NetCdfExtractor extractor = new NetCdfExtractor(this.degribExe, this.netCdfRootFolder, this.subfolderId, var);
     if (!extractor.netCdfFileExists(datetime, fcststep)) {
       netCdfFile = this.downloadAndExtract(extractor, bounds, datetime, fcststep);
     } else {
@@ -63,45 +68,42 @@ public abstract class NoaaGribImporter implements NoaaImporter {
     if (bounds == null) {
       result = this.rasterLoader.getRaster(netCdfFile);
     } else {
-      result = this.rasterLoader.getRaster(netCdfFile, bounds, dims); 
+      result = this.rasterLoader.getRaster(netCdfFile, bounds, dims);
     }
-    
+
     return result;
   }
-  
-  
-  
+
   /**
-   * 
+   *
    * @param extractor
    * @param datetimeref
    * @param forecaststep
-   * @return 
+   * @return
    */
   private NetCdfFile downloadAndExtract(NetCdfExtractor extractor, //
-     Bounds bounds, ZonedDateTime datetimeref, int forecaststep) {
+          Bounds bounds, ZonedDateTime datetimeref, int forecaststep) {
     NetCdfFile result;
     NoaaVariable var = extractor.getVar();
     GribFile gribFile = this.downloadGribFile(var, bounds, datetimeref, forecaststep);
     result = extractor.extract(gribFile);
     return result;
   }
-  
-  
+
   /**
-   * 
+   *
    * @param forecaststep
    * @param datetimeref
-   * @return 
+   * @return
    */
   private GribFile downloadGribFile(NoaaVariable var, Bounds bounds, // 
-    ZonedDateTime datetimeref, int forecaststep) {
+          ZonedDateTime datetimeref, int forecaststep) {
     GribFile gribFile = this.getGribFile(var, datetimeref, forecaststep);
     GribFile subPathGribFile = gribFile.setSubPath(subfolderId);
     GribFile result;
     if (gribFile.exists()) {
       result = this.crop(gribFile, bounds, subPathGribFile);
-    } else if (subPathGribFile.exists()){
+    } else if (subPathGribFile.exists()) {
       result = subPathGribFile;
     } else {
       NoaaGribSource source = this.getGribSource();
@@ -109,18 +111,17 @@ public abstract class NoaaGribImporter implements NoaaImporter {
       if (this.onIsGribCroppable()) {
         result = this.crop(result, bounds, subPathGribFile);
       }
-      
+
     }
     return result;
   }
-  
-  
+
   /**
-   * 
+   *
    * @param gribFile
    * @param bounds
    * @param subPathGribFile
-   * @return 
+   * @return
    */
   private GribFile crop(GribFile gribFile, Bounds bounds, GribFile subPathGribFile) {
     NoaaGribSource source = this.getGribSource();
@@ -153,6 +154,68 @@ public abstract class NoaaGribImporter implements NoaaImporter {
 
   /**
    *
+   * @param dateTime
+   */
+  @Override
+  public void removeRastersBefore(ZonedDateTime dateTime) {
+    File rootFolder = new File(this.netCdfRootFolder, String.format("%04d", this.subfolderId));
+    TreeTraverser<File> traverser = Files.fileTreeTraverser();
+    Iterable<File> yearFiles = traverser.children(rootFolder);
+
+    for (File yearFile : yearFiles) {
+      if (yearFile.isFile()) {
+        continue;
+      }
+
+      int year;
+      try {
+        year = Integer.parseInt(yearFile.getName());
+      } catch (Exception ex) {
+        continue;  // Skip this iteration if parsing fails
+      }
+
+      if (year < dateTime.getYear()) {
+        this.removeFolder(yearFile);
+      } else if (year == dateTime.getYear()) {
+        Iterable<File> monthFiles = traverser.children(yearFile);
+        for (File monthFile : monthFiles) {
+          if (!monthFile.isDirectory()) {
+            continue;
+          }
+          int month;
+          try {
+            month = Integer.parseInt(monthFile.getName());
+          } catch (Exception ex) {
+            continue;  // Skip this iteration if parsing fails
+          }
+
+          if (month < dateTime.getMonthValue()) {
+            this.removeFolder(monthFile);
+          } else if (month == dateTime.getMonthValue()) {
+            Iterable<File> dayFiles = traverser.children(monthFile);
+            for (File dayFile : dayFiles) {
+              if (!dayFile.isDirectory()) {
+                continue; // Skip files, process only directories
+              }
+
+              int day;
+              try {
+                day = Integer.parseInt(dayFile.getName());
+              } catch (Exception ex) {
+                continue; // Skip this iteration if parsing fails
+              }
+              if (day < dateTime.getDayOfMonth()) {
+                this.removeFolder(dayFile);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   *
    * @param forecaststep
    * @param datetimeref
    * @return
@@ -161,26 +224,42 @@ public abstract class NoaaGribImporter implements NoaaImporter {
     String filename = this.onGetGribFileName(var, datetimeref, fcstHour);
     return filename;
   }
-  
+
   /**
-   * 
+   *
+   * @param var
    * @param datetimeref
    * @param fcstHour
-   * @return 
+   * @return
    */
-  protected abstract String onGetGribFileName(NoaaVariable var, ZonedDateTime datetimeref, int fcstHour); 
-  
+  protected abstract String onGetGribFileName(NoaaVariable var, ZonedDateTime datetimeref, int fcstHour);
+
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
-  protected abstract NoaaGribSource getGribSource();  
-  
+  protected abstract NoaaGribSource getGribSource();
+
   /**
-   * 
-   * @return 
+   *
+   * @return
    */
-  protected boolean onIsGribCroppable(){
+  protected boolean onIsGribCroppable() {
     return false;
   } 
+  
+  /**
+   * 
+   * @param folder 
+   */
+  private void removeFolder(File folder) {
+    try {
+      java.nio.file.Files.walk(folder.toPath())
+              .sorted(Comparator.reverseOrder())
+              .map(Path::toFile)
+              .forEach(File::delete);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 }

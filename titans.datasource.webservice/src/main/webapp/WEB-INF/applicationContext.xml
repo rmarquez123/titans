@@ -18,7 +18,7 @@
     <property name="location">
       <value>classpath:../app.properties</value>
     </property>
-  </bean>
+  </bean>    
   <bean id="gribRootFolder" class="java.io.File">
     <constructor-arg value="${files.grib}"/>
   </bean>

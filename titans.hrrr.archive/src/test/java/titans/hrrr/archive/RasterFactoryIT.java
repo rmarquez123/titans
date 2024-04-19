@@ -1,5 +1,7 @@
 package titans.hrrr.archive;
 
+import common.RmObjects;
+import common.geom.SridUtils;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
@@ -14,7 +16,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import common.geom.SridUtils;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.raster.Raster;
@@ -61,5 +62,14 @@ public class RasterFactoryIT extends BaseSpringITest {
     double value = raster.getValue(SridUtils.transform(point, targetSrid));
     System.out.println("value = " + value);
     System.out.println("elapsed time: " + (System.currentTimeMillis() - ms) / 1000.0);
+  }
+    
+  /**
+   * 
+   */
+  @Test
+  public void test03() {
+    ZonedDateTime dateTime = RmObjects.dateTimeOfInUtc("yyyy/MM/dd HH:mm", "2023/01/01 00:00");
+    this.factory.getImporter(0).removeRastersBefore(dateTime);
   }
 }

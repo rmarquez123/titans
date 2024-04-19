@@ -1,5 +1,6 @@
 package rm.titansdata.web.rasters;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,16 @@ public class RasterFactorySupplier {
   public Builder builder() {
     Builder result = new Builder(this.rasterModelsRegistry);
     return result;
+  }
+  
+  /**
+   * 
+   * @param dateTime 
+   */
+  void deleteStoredFilesBefore(int projectId, ZonedDateTime dateTime) {
+    this.rasterModelsRegistry.forEach(factory->{
+      factory.deleteStoredFilesBefore(projectId, dateTime);
+    });
   }
 
   public static class Builder {
@@ -61,8 +72,10 @@ public class RasterFactorySupplier {
     }
 
     /**
-     *
-     * @return
+     * 
+     * @param projectId
+     * @param p
+     * @return 
      */
     public Raster createRaster(int projectId, Parameter p) {
       Raster result;

@@ -65,27 +65,27 @@ public class CustomClassLoader {
   public synchronized void loadLibrary(File jar, String... classes) {
     try {
       URL url = jar.toURI().toURL();
-      
-      ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();      
+
+      ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
       Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class});
       method.setAccessible(true);
-      method.invoke(contextClassLoader, new Object[]{url}); 
+      method.invoke(contextClassLoader, new Object[]{url});
 //      URLClassLoaderWrapper wrapper = new URLClassLoaderWrapper(new URL[]{}, contextClassLoader);
 //      Thread.currentThread().setContextClassLoader(wrapper);
 //      wrapper.addURL(url);
-      
+
       DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) this.applicationContext.getBeanFactory();
-      for (String classe : classes) {  
-        if (classe.endsWith(".xml")) {  
+      for (String classe : classes) {
+        if (classe.endsWith(".xml")) {
           this.loadSpringXml(jar, classe);
-        } else {  
+        } else {
           this.loadByClass(classe, beanFactory);
         }
       }
     } catch (Exception ex) {
       throw new RuntimeException(//     
-        String.format("Cannot load library from jar file '%s'. Reason: %s",
-          jar.getAbsolutePath(), ex.getMessage()), ex);
+              String.format("Cannot load library from jar file '%s'. Reason: %s",
+                      jar.getAbsolutePath(), ex.getMessage()), ex);
     }
   }
 
@@ -108,14 +108,14 @@ public class CustomClassLoader {
       this.parametersFactory.add(key, bean);
     });
     this.applicationContext.getBeansOfType(ColorMapProvider.class).entrySet()
-      .forEach(entry -> {
-        String name = entry.getKey();
-        ColorMapProvider cmProvider = entry.getValue();
-        RasterFactory rasterBean = this.getRasterFactory(name);
-        String key = rasterBean.key();
-        long rasterId = this.service.getRasterIdByKey(key);
-        this.cmProviderFactory.put(rasterId, cmProvider);
-      });
+            .forEach(entry -> {
+              String name = entry.getKey();
+              ColorMapProvider cmProvider = entry.getValue();
+              RasterFactory rasterBean = this.getRasterFactory(name);
+              String key = rasterBean.key();
+              long rasterId = this.service.getRasterIdByKey(key);
+              this.cmProviderFactory.put(rasterId, cmProvider);
+            });
   }
 
   /**
@@ -194,7 +194,7 @@ public class CustomClassLoader {
    */
   private void loadSpringXml(File jar, String beansXml) {
     GenericApplicationContext createdContext
-      = new GenericApplicationContext();
+            = new GenericApplicationContext();
     XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(createdContext);
     reader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
     InputSource inputSource = this.getSpringXmlInputSource(jar, beansXml);
@@ -203,11 +203,11 @@ public class CustomClassLoader {
     ConfigurableApplicationContext genericAppContext = this.applicationContext;
     DefaultListableBeanFactory factory = (DefaultListableBeanFactory) genericAppContext.getBeanFactory();
     Stream.of(names).filter(n -> !n.contains("org.spring"))
-      .forEach(beanname -> {
-        BeanDefinition definition = createdContext.getBeanDefinition(beanname);
-        factory.registerBeanDefinition(beanname, definition);
+            .forEach(beanname -> {
+              BeanDefinition definition = createdContext.getBeanDefinition(beanname);
+              factory.registerBeanDefinition(beanname, definition);
 
-      });
+            });
     this.springXmls.put(jar, beansXml);
   }
 
@@ -221,39 +221,44 @@ public class CustomClassLoader {
    * @throws MalformedURLException
    */
   private InputSource getSpringXmlInputSource(File jar, String beansXml) {
-    try {
-      String someUniqueResourceInBJar = new JarFile(jar).stream()
-        .map(e -> e.getName())
-        .filter(n -> n.endsWith(".class"))
-        .findFirst()
-        .orElseThrow(() -> new RuntimeException());
-      String className = StringUtils.removeEnd(someUniqueResourceInBJar.replace("/", "."), ".class");
-      Class<?> Bclass;
+    Class<?> Bclass;
+    if (beansXml.startsWith("./")) {
       try {
+        String someUniqueResourceInBJar = new JarFile(jar).stream()
+                .map(e -> e.getName())
+                .filter(n -> n.endsWith(".class"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException());
+        String className = StringUtils.removeEnd(someUniqueResourceInBJar.replace("/", "."), ".class");
         Bclass = Class.forName(className);
-      } catch(Exception ex) {
-        throw new RuntimeException(ex);  
-      } 
-      URL url = Bclass.getResource("/" + beansXml.trim());
-      if (url == null) {
-        throw RmExceptions.create("Resource '%s' not found.", beansXml); 
+      } catch (Exception ex) {
+        throw new RuntimeException(ex);
+      }
+    } else {
+      beansXml = beansXml.replace("./", "");
+      Bclass = this.getClass();
+    }
+    try {
+      URL url = Bclass.getResource("/" + beansXml.trim());   
+      if (url == null) {  
+        throw RmExceptions.create("Resource '%s' not found.", beansXml);
       }  
       InputStream stream = url.openStream();  
       InputSource inputSource = new InputSource(new InputStreamReader(stream));
       return inputSource;
-    } catch (Exception ex) {
+    } catch (Exception ex) {   
       throw new RuntimeException(ex);
     }
   }
-  
+
   /**
-   * 
+   *
    * @param jar
-   * @param beansXml 
+   * @param beansXml
    */
   private void loadBeans(File jar, String beansXml) {
     GenericApplicationContext createdContext
-      = new GenericApplicationContext();
+            = new GenericApplicationContext();
     XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(createdContext);
     reader.setValidationMode(XmlBeanDefinitionReader.VALIDATION_XSD);
     InputSource inputSource = this.getSpringXmlInputSource(jar, beansXml);
@@ -262,8 +267,8 @@ public class CustomClassLoader {
     ConfigurableApplicationContext genericAppContext = this.applicationContext;
     DefaultListableBeanFactory factory = (DefaultListableBeanFactory) genericAppContext.getBeanFactory();
     Stream.of(names).filter(n -> !n.contains("org.spring"))
-      .forEach(beanname -> {
-        Object bean = factory.getBean(beanname);
-      });
+            .forEach(beanname -> {
+              Object bean = factory.getBean(beanname);
+            });
   }
 }

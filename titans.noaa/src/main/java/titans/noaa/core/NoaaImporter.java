@@ -21,5 +21,11 @@ public interface NoaaImporter {
    */
   RasterObj getRaster(NoaaVariable var, ZonedDateTime datetime, int fcststep, // 
     Bounds bounds, Dimensions dims);
+
+  /**
+   * 
+   * @param dateTime 
+   */
+  public void removeRastersBefore(ZonedDateTime dateTime);
   
 }

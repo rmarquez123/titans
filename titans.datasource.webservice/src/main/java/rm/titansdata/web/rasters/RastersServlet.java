@@ -70,23 +70,30 @@ public class RastersServlet {
   @Qualifier("user.project")
   private SessionScopedBean<ProjectEntity> projectEntity;
 
+  @RequestMapping(path = "/getRasters",
+          params = {"userId"},
+          method = RequestMethod.GET
+  )
+  public void cleanup(HttpServletRequest req, HttpServletResponse response) {
+
+  }
+
   /**
    *
    * @param req
    * @param response
    */
   @RequestMapping(path = "/getRasters",
-          params = {"userId"},
+          params = {
+            "projectId", "dateTime"
+          },
           method = RequestMethod.GET
   )
   public void getRasters(HttpServletRequest req, HttpServletResponse response) {
     RequestParser parser = new RequestParser(req);
-    Long userId = parser.getLong("userId");
-    Map<RasterGroupEntity, List<Long>> values = this.rastersSourceService.getRastersByUserId(userId);
-    Map<String, Object> map = new HashMap<>();
-    JSONObject obj = toJson(values);
-    map.put("values", obj.toString());
-    this.responseHelper.send(map, response);
+    int projectId = parser.getInteger("projectId");
+    ZonedDateTime zonedDateTime = parser.getZonedDateTime("dateTime", "UTC");
+    rastersValueService.deleteStoredFilesBefore(projectId, zonedDateTime);
   }
 
   /**
@@ -269,7 +276,7 @@ public class RastersServlet {
         JSONObject jsonObject = jsonArr.getJSONObject(i);
         Parameter param = parameterFactory.get(jsonObject);
         params.add(param);
-      } catch(Exception ex) {
+      } catch (Exception ex) {
         throw new RuntimeException(ex);
       }
     }
@@ -286,7 +293,7 @@ public class RastersServlet {
       Parameter param = params.get(paramIndex);
       Map<Integer, Double> values = this.rastersValueService //
               .getRasterValue(rasterId, projectId, param, ps);
-      
+
       for (Map.Entry<Integer, Double> entry : values.entrySet()) {
         Integer pointIndex = entry.getKey();
         if (paramIndex == 0) {
@@ -515,9 +522,9 @@ public class RastersServlet {
     Parameter param = parameterFactory.get(jsonObject);
     Bounds bounds = this.getBoundsFromProject();
     int projectId = this.getProjectId();
-    String colorMap = parser.getString("colorMap"); 
+    String colorMap = parser.getString("colorMap");
     RasterImageResult image = this.rastersImageService.getRasterImage//
-        (rasterId, projectId, param, bounds, colorMap);
+            (rasterId, projectId, param, bounds, colorMap);
     Map<String, Object> map = new HashMap<>();
     map.put("value", image);
     this.responseHelper.send(map, res);
