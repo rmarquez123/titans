@@ -1,8 +1,8 @@
 package rm.titansdata.web.project;
 
-import com.google.common.base.Objects;
 import common.db.DbConnection;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -103,7 +103,7 @@ public class ProjectStore {
       result = "delete from projects.project_envelope p where p.project_id = " + projectId;
     } else {
       int srid = upperight.getSRID();
-      if (!Objects.equal(upperight.getSRID(), lowerleft.getSRID())) {
+      if (!Objects.equals(upperight.getSRID(), lowerleft.getSRID())) {
         throw new RuntimeException("Srids are not equal");
       }
       result = "insert into \n"

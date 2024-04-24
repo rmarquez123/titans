@@ -1,5 +1,6 @@
 package rm.titansdata.raster;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import javax.measure.Measure;
@@ -159,4 +160,10 @@ public class CellsRaster implements Raster {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
+  @Override
+  public void close() throws IOException {
+    
+  }
+
+  
 }

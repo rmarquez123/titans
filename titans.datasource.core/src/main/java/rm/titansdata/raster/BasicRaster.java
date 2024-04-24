@@ -1,5 +1,6 @@
 package rm.titansdata.raster;
 
+import java.io.IOException;
 import java.util.List;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
@@ -99,4 +100,14 @@ public abstract class BasicRaster implements Raster {
     // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     throw new UnsupportedOperationException("Not supported yet.");
   }
+  
+  /**
+   * 
+   * @throws IOException 
+   */
+  @Override
+  public void close() throws IOException {
+    
+  }
+  
 }

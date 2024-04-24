@@ -1,5 +1,6 @@
 package titans.noaa.netcdf;
 
+import java.io.IOException;
 import java.util.List;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
@@ -43,7 +44,11 @@ public class BufferedNetCdfRaster extends BasicRaster {
     // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     throw new UnsupportedOperationException("Not supported yet.");
   }
-  
-  
+
+  @Override
+  public void close() throws IOException {
+    // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
   
 }

@@ -1,6 +1,7 @@
 package rm.titansdata.web;
 
 import common.RmObjects;
+import common.geom.SridUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -14,7 +15,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import common.geom.SridUtils;
 
 /**
  *
@@ -60,9 +60,9 @@ public class StartupTest implements InitializingBean {
     Logger logger = Logger.getLogger(StartupTest.class.getName());
     logger.log(Level.INFO, "process result {0}", processresult);
     Charset chartset = Charset.forName("utf8");
-    IOUtils.readLines(process.getErrorStream(), chartset)
+    IOUtils.readLines(process.getErrorStream())
             .forEach(l -> logger.log(Level.INFO, l));
-    IOUtils.readLines(process.getInputStream(), chartset)
+    IOUtils.readLines(process.getInputStream())
             .forEach(l -> logger.log(Level.INFO, l));
     if (!netCdfFile.exists()) {
       throw new RuntimeException(String.format("Netcdf file not created {%s}", netCdfFile));

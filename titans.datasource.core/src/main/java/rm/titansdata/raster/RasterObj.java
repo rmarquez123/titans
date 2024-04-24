@@ -2,6 +2,8 @@ package rm.titansdata.raster;
 
 import common.RmTimer;
 import common.geom.SridUtils;
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import javafx.util.Pair;
@@ -21,7 +23,7 @@ import rm.titansdata.properties.Properties;
  *
  * @author Ricardo Marquez
  */
-public class RasterObj {
+public class RasterObj implements Closeable{
 
   private final String name;
   private final Properties properties;
@@ -192,6 +194,17 @@ public class RasterObj {
     Geometry envelope = transformed.getEnvelope();
     return envelope;
   }
+
+  /**
+   * 
+   * @throws IOException 
+   */
+  @Override
+  public void close() throws IOException {
+    this.raster.close();
+  }
+  
+  
   
   /**
    * 

@@ -1,5 +1,6 @@
 package rm.titansdata.raster;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.measure.quantity.Quantity;
@@ -67,4 +68,10 @@ public class NullRaster implements Raster {
   public List<Point> getPoints(LinearRing string) {
     return new ArrayList<>(); 
   }
+
+  @Override
+  public void close() throws IOException {
+  }
+  
+  
 }

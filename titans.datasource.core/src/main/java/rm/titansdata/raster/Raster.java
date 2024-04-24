@@ -1,5 +1,6 @@
 package rm.titansdata.raster;
 
+import java.io.Closeable;
 import java.util.List;
 import javax.measure.quantity.Quantity;
 import javax.measure.unit.Unit;
@@ -14,7 +15,7 @@ import org.locationtech.jts.geom.Point;
  *
  * @author Ricardo Marquez
  */
-public interface Raster {
+public interface Raster extends Closeable{
   
   /**
    * 

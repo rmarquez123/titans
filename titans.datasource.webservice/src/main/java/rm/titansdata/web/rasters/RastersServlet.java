@@ -1,10 +1,12 @@
 package rm.titansdata.web.rasters;
 
-import common.RmTimer;
+import common.RmObjects;
 import common.geom.SridUtils;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -30,6 +32,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import rm.titansdata.Parameter;
 import rm.titansdata.plugin.ClassType;
 import rm.titansdata.plugin.Clazz;
@@ -43,6 +47,7 @@ import rm.titansdata.web.project.ProjectEntity;
 import rm.titansdata.web.user.session.SessionManager;
 import rm.titansdata.web.user.session.SessionScopedBean;
 import titans.noaa.core.NoaaParameter;
+import titans.noaa.netcdf.NetCdfRaster;
 
 /**
  *
@@ -70,12 +75,22 @@ public class RastersServlet {
   @Qualifier("user.project")
   private SessionScopedBean<ProjectEntity> projectEntity;
 
-  @RequestMapping(path = "/getRasters",
-          params = {"userId"},
-          method = RequestMethod.GET
+  /**
+   *
+   * @param req
+   * @param response
+   */
+  @RequestMapping(path = "/cleanup",
+          params = {
+            "projectId", "dateTime", "zoneId"
+          },
+          method = RequestMethod.POST
   )
   public void cleanup(HttpServletRequest req, HttpServletResponse response) {
-
+    RequestParser parser = new RequestParser(req);
+    int projectId = parser.getInteger("projectId");
+    ZonedDateTime zonedDateTime = parser.getZonedDateTime("dateTime", "zoneId");
+    rastersValueService.deleteStoredFilesBefore(projectId, zonedDateTime);
   }
 
   /**
@@ -84,16 +99,17 @@ public class RastersServlet {
    * @param response
    */
   @RequestMapping(path = "/getRasters",
-          params = {
-            "projectId", "dateTime"
-          },
+          params = {"userId"},
           method = RequestMethod.GET
   )
   public void getRasters(HttpServletRequest req, HttpServletResponse response) {
     RequestParser parser = new RequestParser(req);
-    int projectId = parser.getInteger("projectId");
-    ZonedDateTime zonedDateTime = parser.getZonedDateTime("dateTime", "UTC");
-    rastersValueService.deleteStoredFilesBefore(projectId, zonedDateTime);
+    Long userId = parser.getLong("userId");
+    Map<RasterGroupEntity, List<Long>> values = this.rastersSourceService.getRastersByUserId(userId);
+    Map<String, Object> map = new HashMap<>();
+    JSONObject obj = toJson(values);
+    map.put("values", obj.toString());
+    this.responseHelper.send(map, response);
   }
 
   /**
@@ -250,10 +266,8 @@ public class RastersServlet {
     Bounds bounds = this.getBoundsFromProject();
     RasterCells values = this.rastersValueService
             .getRasterValues(rasterId, projectId, param, geometry, bounds);
-    RmTimer timer = RmTimer.start();
     String result = JsonConverterUtil.toJson(values);
     this.responseHelper.sendAsZippedFile(result, res);
-    timer.endAndPrint("sending");
   }
 
   /**
@@ -303,10 +317,9 @@ public class RastersServlet {
         pointValues.get(pointIndex).values.add(entry.getValue());
       }
     }
-    RmTimer timer = RmTimer.start();
+
     String result = JsonConverterUtil.toJson(pointValues);
     this.responseHelper.sendAsZippedFile(result, res);
-    timer.endAndPrint("sending");
   }
 
   public static class PointValues {
@@ -381,6 +394,7 @@ public class RastersServlet {
           method = RequestMethod.GET
   )
   public void getRasterPointValues(HttpServletRequest req, HttpServletResponse res) {
+
     RequestParser parser = new RequestParser(req);
     long rasterId = parser.getLong("rasterId");
     int srid = parser.getInteger("srid");
@@ -398,6 +412,7 @@ public class RastersServlet {
             .collect(Collectors.toMap(d -> d.getKey().getKey(), d -> d.getValue()));
     map.put("values", s);
     this.responseHelper.send(map, res);
+
   }
 
   /**
@@ -422,6 +437,65 @@ public class RastersServlet {
             .getRasterValue(rasterId, projectId, param, points);
     map.put("values", values);
     this.responseHelper.send(map, res);
+  }
+
+  @RequestMapping(
+          path = "/getRasterPointListFromCsvValues",
+//          params = {"rasterId", "parameter", "srid", "file"},
+          method = RequestMethod.POST)
+  public void getRasterPointListFromCsvValues( //
+          @RequestParam("rasterId") long rasterId,
+          @RequestParam("parameter") JSONObject jsonObject,
+          @RequestParam("srid") int srid,
+          @RequestParam("file") MultipartFile file,
+          HttpServletRequest req,
+          HttpServletResponse res) throws Exception {
+    Map<Integer, Point> points = parseCsvFile(file, srid);
+    Parameter param = this.parameterFactory.get(jsonObject);
+    int projectId = this.getProjectId();
+    Map<Integer, Double> values = this.rastersValueService.getRasterValue( //
+            rasterId, projectId, param, points);
+    JSONObject valuesJson = new JSONObject();
+    for (Map.Entry<Integer, Double> entry : values.entrySet()) {
+      valuesJson.put(String.valueOf(entry.getKey()), entry.getValue());
+    }
+    JSONObject result = new JSONObject();
+    result.put("values", valuesJson);
+    this.responseHelper.sendAsZippedFile(result.toString(), res);
+  }
+
+  /**
+   *
+   * @param file
+   * @param srid
+   * @return
+   * @throws Exception
+   */
+  private Map<Integer, Point> parseCsvFile(MultipartFile file, int srid) {
+    Map<Integer, Point> pointsMap = new HashMap<>();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+      String line;
+      GeometryFactory f = RmObjects.getGeometryFactory(srid);
+      while ((line = reader.readLine()) != null) {
+        String[] data = line.split(",");
+        int id = Integer.parseInt(data[0].trim());
+        double x = Double.parseDouble(data[1].trim());
+        double y = Double.parseDouble(data[2].trim());
+        Point point = RmObjects.createPoint(f, x, y);
+        pointsMap.put(id, point);
+      }
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    }
+    return pointsMap;
+  }
+
+  /**
+   *
+   */
+  @RequestMapping(path = "/clearNetCdfs", method = RequestMethod.POST)
+  public void clearNetCdfs(HttpServletRequest req, HttpServletResponse res) {
+    NetCdfRaster.clearNetCdfs();
   }
 
   /**

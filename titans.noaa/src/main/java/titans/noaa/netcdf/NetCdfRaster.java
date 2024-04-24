@@ -3,10 +3,11 @@ package titans.noaa.netcdf;
 import common.RmExceptions;
 import common.RmObjects;
 import common.geom.SridUtils;
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -27,11 +28,23 @@ import ucar.unidata.geoloc.LatLonPoint;
  *
  * @author Ricardo Marquez
  */
-public final class NetCdfRaster extends BasicRaster implements Closeable {
+public final class NetCdfRaster extends BasicRaster  {
+  
+  public static synchronized void clearNetCdfs() {
+    for (GridDataset value : CACHE.values()) {
+      try {
+        value.close();
+      } catch(Exception ex) {
+      }
+    }
+    CACHE.clear();
+  }
 
   private final NetCdfFile netCdfFile;
   private GridDataset griddatasetsCache = null;
   private Array arr;
+  
+  public static Map<NetCdfFile, GridDataset> CACHE = new HashMap<>(); 
 
   public NetCdfRaster(NetCdfFile netCdfFile, Bounds bounds, Dimensions dims) {
     super(netCdfFile.getUnits(), bounds, dims);
@@ -74,6 +87,7 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
   public void close() throws IOException {
     if (this.griddatasetsCache != null) {
       this.griddatasetsCache.close();
+      CACHE.remove(this.netCdfFile); 
     }
   }
 
@@ -84,13 +98,19 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
   private synchronized void initGridDataset(NetCdfFile netCdfFile) {
     if (this.griddatasetsCache == null) {
       String filepath = netCdfFile.file.getAbsolutePath();
+      if (CACHE.containsKey(this.netCdfFile)) {
+        this.griddatasetsCache = CACHE.get(this.netCdfFile);
+        return;
+      }
       try {
         this.griddatasetsCache = GridDataset.open(filepath);
+        CACHE.clear();
+        CACHE.put(this.netCdfFile, this.griddatasetsCache); 
       } catch (IOException ex) {
         throw new RuntimeException(ex);
       }
     }
-    
+
   }
 
   /**
@@ -117,7 +137,7 @@ public final class NetCdfRaster extends BasicRaster implements Closeable {
   private GridDatatype getGridDatatype(NetCdfFile netCdfFile) {
     String varName = netCdfFile.getVarName();
     List<GridDatatype> list = getGrid();
-    GridDatatype grid = list
+    GridDatatype grid = list //
             .stream() //
             .filter((g) -> g.getName().equals(varName)) //
             .findFirst() //

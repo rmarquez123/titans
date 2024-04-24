@@ -108,19 +108,25 @@ public class RastersValueService {
    * @param points
    * @return
    */
-  public Map<Integer, Double> getRasterValue(Long rasterId, int projectId, Parameter parameter, Map<Integer, Point> points) {
-    RasterEntity rasterEntity = this.sourceService.getRaster(rasterId);
-    Bounds bounds = rasterEntity.getBounds();
-    
-    RasterObj rasterObj = this.getRasterObj( //
-            rasterEntity, rasterEntity.sourceTitle, //
-            projectId, parameter, bounds);
-    Map<Integer, Double> result = new HashMap<>();
-    for (Map.Entry<Integer, Point> entry : points.entrySet()) {
-      double r = rasterObj.getValue(entry.getValue());
-      result.put(entry.getKey(), r);
+  public Map<Integer, Double> getRasterValue( //
+          Long rasterId, int projectId, Parameter parameter, Map<Integer, Point> points) {
+    try {
+      RasterEntity rasterEntity = this.sourceService.getRaster(rasterId);
+      Bounds bounds = rasterEntity.getBounds();
+      Map<Integer, Double> result;
+      try (RasterObj rasterObj = this.getRasterObj( //
+              rasterEntity, rasterEntity.sourceTitle, //
+              projectId, parameter, bounds)) {
+        result = new HashMap<>();
+        for (Map.Entry<Integer, Point> entry : points.entrySet()) {
+          double r = rasterObj.getValue(entry.getValue());
+          result.put(entry.getKey(), r);
+        }
+      }
+      return result;
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
     }
-    return result;
   }
 
   /**
