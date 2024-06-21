@@ -1,4 +1,4 @@
-package titans.hrrr.archive.core;
+package titans.href.core;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatterBuilder;
@@ -8,12 +8,13 @@ import titans.noaa.core.NoaaParameter;
 import titans.noaa.grib.GribFile;
 
 /**
- * https://noaa-hrrr-bdp-pds.s3.amazonaws.com/hrrr.20140807/conus/hrrr.t06z.wrfsfcf06.grib2
+ * https://nomads.ncep.noaa.gov/pub/data/nccf/com/href/prod/href.20240604/ensprod/href.t00z.conus.avrg.f02.grib2
+ *
  * @author Ricardo Marquez
  */
-public class HrrrArchiveGribSource extends NoaaGribSource {
+public class HrefGribSource extends NoaaGribSource {
 
-  private final String url = "https://noaa-hrrr-bdp-pds.s3.amazonaws.com/";
+  private final String url = "https://nomads.ncep.noaa.gov/pub/data/nccf/com/href/prod/";
 
   /**
    *
@@ -25,7 +26,7 @@ public class HrrrArchiveGribSource extends NoaaGribSource {
     String dateTxt = gribFile.datetimeref
             .toOffsetDateTime().atZoneSameInstant(ZoneId.of("UTC"))
             .format(new DateTimeFormatterBuilder().appendPattern("yyyyMMdd").toFormatter());
-    String result = String.format("%shrrr.%s/conus/%s",
+    String result = String.format("%shref.%s/ensprod/%s",
             this.url, dateTxt, baseFileName);
     return result;
   }

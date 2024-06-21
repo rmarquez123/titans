@@ -27,5 +27,14 @@ public interface NoaaImporter {
    * @param dateTime 
    */
   public void removeRastersBefore(ZonedDateTime dateTime);
+
+  /**
+   * 
+   * @param var
+   * @param datetimeref
+   * @param forecaststep 
+   */
+  public void removeIntermediateFiles(NoaaVariable var, ZonedDateTime datetimeref, int forecaststep);
+  
   
 }

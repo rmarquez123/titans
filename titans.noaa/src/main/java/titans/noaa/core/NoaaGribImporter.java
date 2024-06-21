@@ -154,19 +154,37 @@ public abstract class NoaaGribImporter implements NoaaImporter {
 
   /**
    *
+   * @param var
+   * @param datetimeref
+   * @param forecaststep
+   */
+  @Override
+  public void removeIntermediateFiles( //
+          NoaaVariable var, ZonedDateTime datetimeref, int forecaststep) {
+    GribFile gribFile = this.getGribFile(var, datetimeref, forecaststep);
+    if (gribFile.exists()) {
+      gribFile.delete();
+    }
+  }
+
+  /**
+   *
    * @param dateTime
    */
   @Override
   public void removeRastersBefore(ZonedDateTime dateTime) {
-    File rootFolder = new File(this.netCdfRootFolder, String.format("%04d", this.subfolderId));
+    String subPath = String.format("%04d", this.subfolderId);
+    GribFileManager fileManager = new GribFileManager(this.netCdfRootFolder, this.subfolderId);
+    File rootFolder = new File(this.netCdfRootFolder, subPath);
+    
     TreeTraverser<File> traverser = Files.fileTreeTraverser();
     Iterable<File> yearFiles = traverser.children(rootFolder);
-
+    
     for (File yearFile : yearFiles) {
       if (yearFile.isFile()) {
         continue;
       }
-
+      
       int year;
       try {
         year = Integer.parseInt(yearFile.getName());
@@ -188,7 +206,6 @@ public abstract class NoaaGribImporter implements NoaaImporter {
           } catch (Exception ex) {
             continue;  // Skip this iteration if parsing fails
           }
-
           if (month < dateTime.getMonthValue()) {
             this.removeFolder(monthFile);
           } else if (month == dateTime.getMonthValue()) {
@@ -197,7 +214,6 @@ public abstract class NoaaGribImporter implements NoaaImporter {
               if (!dayFile.isDirectory()) {
                 continue; // Skip files, process only directories
               }
-
               int day;
               try {
                 day = Integer.parseInt(dayFile.getName());
@@ -246,11 +262,11 @@ public abstract class NoaaGribImporter implements NoaaImporter {
    */
   protected boolean onIsGribCroppable() {
     return false;
-  } 
-  
+  }
+
   /**
-   * 
-   * @param folder 
+   *
+   * @param folder
    */
   private void removeFolder(File folder) {
     try {

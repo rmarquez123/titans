@@ -92,6 +92,26 @@ public class RastersServlet {
     ZonedDateTime zonedDateTime = parser.getZonedDateTime("dateTime", "zoneId");
     rastersValueService.deleteStoredFilesBefore(projectId, zonedDateTime);
   }
+  
+  /**
+   * 
+   * @param req
+   * @param response 
+   */
+  @RequestMapping(path = "/removeIntermediateFiles",
+          params = {
+            "projectId", "dateTime", "zoneId", "fcstStep", "parameter",},
+          method = RequestMethod.POST
+  )
+  public void removeIntermediateFiles(HttpServletRequest req, HttpServletResponse response) {
+    RequestParser parser = new RequestParser(req);
+    int projectId = parser.getInteger("projectId");
+    ZonedDateTime zonedDateTime = parser.getZonedDateTime("dateTime", "zoneId");
+    int fcstStep = parser.getInteger("fcstStep");
+    JSONObject jsonObject = this.getParameterJson(parser);
+    Parameter param = parameterFactory.get(jsonObject);
+    rastersValueService.deleteIntermediateFiles(projectId, param, zonedDateTime, fcstStep);
+  }
 
   /**
    *
@@ -441,7 +461,7 @@ public class RastersServlet {
 
   @RequestMapping(
           path = "/getRasterPointListFromCsvValues",
-//          params = {"rasterId", "parameter", "srid", "file"},
+          //          params = {"rasterId", "parameter", "srid", "file"},
           method = RequestMethod.POST)
   public void getRasterPointListFromCsvValues( //
           @RequestParam("rasterId") long rasterId,

@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import javax.measure.unit.Unit;
 import org.apache.commons.io.IOUtils;
 import rm.titansdata.units.UnitsUtils;
-import titans.noaa.core.NoaaVarClazz;
 import titans.noaa.core.InventoryReader;
+import titans.noaa.core.NoaaVarClazz;
 
 
 /**
@@ -78,7 +78,6 @@ public class HrrrSfcInventoryReader implements InventoryReader{
 
   /**
    * 
-   * @param noaaVar
    * @return 
    */
   @Override

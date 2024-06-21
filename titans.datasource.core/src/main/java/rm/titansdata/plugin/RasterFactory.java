@@ -35,4 +35,13 @@ public interface RasterFactory {
    */
   public void deleteStoredFilesBefore(int projectId, ZonedDateTime dateTime);
   
+  /**
+   * 
+   * @param projectId
+   * @param p
+   * @param dateTime
+   * @param fcstStep 
+   */  
+  public void deleteIntermediateFiles(int projectId, Parameter p, ZonedDateTime dateTime, int fcstStep);
+  
 }

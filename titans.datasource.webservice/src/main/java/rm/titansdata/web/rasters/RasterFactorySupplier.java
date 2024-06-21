@@ -38,6 +38,17 @@ public class RasterFactorySupplier {
       factory.deleteStoredFilesBefore(projectId, dateTime);
     });
   }
+  
+  /***
+   * 
+   * @param projectId
+   * @param dateTime 
+   */
+  void deleteIntermediateFiles(int projectId, Parameter param, ZonedDateTime dateTime, int fcstStep) {
+    this.rasterModelsRegistry.forEach(factory->{
+      factory.deleteIntermediateFiles(projectId, param, dateTime, fcstStep);
+    });
+  }
 
   public static class Builder {
 

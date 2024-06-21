@@ -19,16 +19,15 @@ import rm.titansdata.web.rasters.RastersValueService;
  */
 @Component
 public class ColorMapProviderFactory {
-
+  
   @Autowired
   private RastersValueService rastersValueService;
-
+  
   @Autowired
   private RastersSourceService sourceService;
-
+  
   private final Map<Long, ColorMapProvider> providers = new HashMap<>();
-  
-  
+
   /**
    *
    * @param rasterId
@@ -46,12 +45,12 @@ public class ColorMapProviderFactory {
    */
   public ColorMapProvider getProvider(long rasterId, int projectId) {
     ColorMapProvider result;
-    if (providers.containsKey(rasterId)) {   
-      result = this.providers.get(rasterId);   
+    if (providers.containsKey(rasterId)) {      
+      result = this.providers.get(rasterId);      
     } else {
       result = (int projectId1, String colorMap, Parameter param) -> defaultColorMap(rasterId, projectId1, param, colorMap);
     }
-    return result;   
+    return result;    
   }
 
   /**
@@ -60,25 +59,26 @@ public class ColorMapProviderFactory {
    * @param projectId
    * @param param
    * @param colorMap
-   * @return 
+   * @return
    */
   public ColorMap defaultColorMap(long rasterId, int projectId, Parameter param, String colorMap) {
     Bounds bounds = this.sourceService.getRaster(rasterId).getBounds();
     RasterObj r = this.rastersValueService.getRasterObj(rasterId, projectId, param, bounds);
     RasterSearch s = new RasterSearch(r.getBounds(), r.getDimensions());
     double max = s.stream(b -> r.getValue(b))
-      .mapToDouble(i -> i.getValue().getValue())
-      .max()
-      .orElseThrow(() -> new RuntimeException());
+            .mapToDouble(i -> i.getValue().getValue())
+            .max()
+            .orElseThrow(() -> new RuntimeException());
     double min = s.stream(b -> r.getValue(b))
-      .mapToDouble(i -> i.getValue().getValue())
-      .min()
-      .orElseThrow(() -> new RuntimeException());
+            .mapToDouble(i -> i.getValue().getValue())
+            .min()
+            .orElseThrow(() -> new RuntimeException());
     ColorMap cmap = new ColorMap.Builder()
-      .setXmin(min)
-      .setXmax(max)
-      .setColorMapName(colorMap)
-      .build();
+            .setXmin(min)
+            .setXmax(max)
+            .setColorMapName(colorMap)
+            .setUnits("Unit")
+            .build();
     return cmap;
   }
 }

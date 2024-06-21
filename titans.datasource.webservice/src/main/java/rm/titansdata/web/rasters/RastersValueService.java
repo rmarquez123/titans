@@ -186,6 +186,16 @@ public class RastersValueService {
    */
   void deleteStoredFilesBefore(int projectId, ZonedDateTime dateTime) {
     this.supplier.deleteStoredFilesBefore(projectId, dateTime);
-            
+  } 
+    
+  /**
+   * 
+   * @param projectId
+   * @param param
+   * @param dateTime
+   * @param fcstStep 
+   */
+  void deleteIntermediateFiles(int projectId, Parameter param, ZonedDateTime dateTime, int fcstStep) {
+    this.supplier.deleteIntermediateFiles(projectId, param, dateTime, fcstStep);
   }
 }

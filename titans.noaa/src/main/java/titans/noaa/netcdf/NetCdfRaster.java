@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.LinearRing;
@@ -28,13 +27,13 @@ import ucar.unidata.geoloc.LatLonPoint;
  *
  * @author Ricardo Marquez
  */
-public final class NetCdfRaster extends BasicRaster  {
-  
+public final class NetCdfRaster extends BasicRaster {
+
   public static synchronized void clearNetCdfs() {
     for (GridDataset value : CACHE.values()) {
       try {
         value.close();
-      } catch(Exception ex) {
+      } catch (Exception ex) {
       }
     }
     CACHE.clear();
@@ -43,8 +42,8 @@ public final class NetCdfRaster extends BasicRaster  {
   private final NetCdfFile netCdfFile;
   private GridDataset griddatasetsCache = null;
   private Array arr;
-  
-  public static Map<NetCdfFile, GridDataset> CACHE = new HashMap<>(); 
+
+  public static Map<NetCdfFile, GridDataset> CACHE = new HashMap<>();
 
   public NetCdfRaster(NetCdfFile netCdfFile, Bounds bounds, Dimensions dims) {
     super(netCdfFile.getUnits(), bounds, dims);
@@ -87,7 +86,7 @@ public final class NetCdfRaster extends BasicRaster  {
   public void close() throws IOException {
     if (this.griddatasetsCache != null) {
       this.griddatasetsCache.close();
-      CACHE.remove(this.netCdfFile); 
+      CACHE.remove(this.netCdfFile);
     }
   }
 
@@ -105,7 +104,7 @@ public final class NetCdfRaster extends BasicRaster  {
       try {
         this.griddatasetsCache = GridDataset.open(filepath);
         CACHE.clear();
-        CACHE.put(this.netCdfFile, this.griddatasetsCache); 
+        CACHE.put(this.netCdfFile, this.griddatasetsCache);
       } catch (IOException ex) {
         throw new RuntimeException(ex);
       }
@@ -359,16 +358,22 @@ public final class NetCdfRaster extends BasicRaster  {
     List<Point> resultPoints = new ArrayList<>();
     int wgs = 4326;
     LinearRing linearRing = SridUtils.transform(linearRingArg, wgs);
-    Envelope envelope = linearRing.getEnvelopeInternal();
     GeometryFactory factory = RmObjects.getWgs84Factory();
     GridCoordSystem gcs = this.getCoordinateSystem();
-    int[] minIndex = gcs.findXYindexFromLatLon(envelope.getMinY(), envelope.getMinX(), null);
-    int[] maxIndex = gcs.findXYindexFromLatLon(envelope.getMaxY(), envelope.getMaxX(), null);
-
+    int lengthX = this.getGrid().get(0).getDimension(2).getLength();
+    int lengthY = this.getGrid().get(0).getDimension(1).getLength();
+    int[] minIndex = new int[]{0, 0};
+    int[] maxIndex = new int[]{lengthX, lengthY};
+    
     Polygon polygon = factory.createPolygon(linearRing);
-    for (int xIndex = minIndex[0]; xIndex <= maxIndex[0]; xIndex++) {
-      for (int yIndex = minIndex[1]; yIndex <= maxIndex[1]; yIndex++) {
-        LatLonPoint latLon = gcs.getLatLon(xIndex, yIndex);
+    for (int xIndex = minIndex[0]; xIndex < maxIndex[0]; xIndex++) {
+      for (int yIndex = minIndex[1]; yIndex < maxIndex[1]; yIndex++) {
+        LatLonPoint latLon;
+        try {
+          latLon = gcs.getLatLon(xIndex, yIndex);
+        } catch(Exception ex) {
+          throw new RuntimeException(ex);
+        }
         double lon = latLon.getLongitude();
         double lat = latLon.getLatitude();
         Point gridPoint = RmObjects.createPoint(factory, lon, lat);

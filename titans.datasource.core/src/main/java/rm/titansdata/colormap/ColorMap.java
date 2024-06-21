@@ -13,13 +13,23 @@ public class ColorMap {
   
   
   public final String colorMapName;
+  
   public final double xmin;
   public final double xmax;
-
-  private ColorMap(String colorMapName, double xmin, double xmax) {
+  public final String units;
+  
+  /***
+   * 
+   * @param colorMapName
+   * @param xmin
+   * @param xmax
+   * @param units 
+   */
+  private ColorMap(String colorMapName, double xmin, double xmax, String units) {
     this.colorMapName = colorMapName;
     this.xmin = xmin;
     this.xmax = xmax;
+    this.units = units;
   }
 
   /**
@@ -117,8 +127,8 @@ public class ColorMap {
 
     private double xmin;
     private double xmax;
-
     private String colorMapName;
+    private String units;
 
     public Builder setXmax(double xmax) {
       this.xmax = xmax;
@@ -135,8 +145,14 @@ public class ColorMap {
       return this;
     }
 
+    public Builder setUnits(String units) {
+      this.units = units;
+      return this;
+    }
+    
+
     public ColorMap build() {
-      return new ColorMap(this.colorMapName, xmin, xmax);
+      return new ColorMap(this.colorMapName, xmin, xmax, units);
     }
   }
 }

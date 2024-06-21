@@ -146,6 +146,7 @@ public class RasterImage {
    * @return 
    */
   public ColorMapObject colorMapObject() {
-    return new ColorMapObject(this.cmap.xmin, this.cmap.xmax, this.cmap.colorMapName); 
+    ColorMapObject instance = new ColorMapObject(this.cmap.xmin, this.cmap.xmax, this.cmap.units, this.cmap.colorMapName);
+    return instance; 
   }
 }
