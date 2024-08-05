@@ -55,10 +55,14 @@ public abstract class NoaaNetCdfImporter implements NoaaImporter {
    * @param forecaststep
    * @return 
    */
-  private void downloadAndExtract(NetCdfFile netcdffile, ZonedDateTime datetimeref, int forecaststep) {
+  private void downloadAndExtract(NetCdfFile netcdffile, // 
+          ZonedDateTime datetimeref, int forecaststep) {
     String urlstring = this.onGetUrlString(netcdffile.getVarName(), datetimeref, forecaststep);
-    InputStream inputStream = new RmHttpReader.Builder(urlstring).readStream();
-    netcdffile.save(inputStream);
+    try (InputStream inputStream = new RmHttpReader.Builder(urlstring).readStream()) {
+      netcdffile.save(inputStream);
+    } catch(Exception ex) {
+      throw new RuntimeException(ex);
+    }
   }
   
 

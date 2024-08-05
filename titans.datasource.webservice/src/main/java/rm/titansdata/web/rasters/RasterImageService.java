@@ -3,10 +3,10 @@ package rm.titansdata.web.rasters;
 import common.geom.SridUtils;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.time.ZonedDateTime;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
-import javax.servlet.ServletContext;
 import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class RasterImageService {
   private ColorMapProviderFactory factory;
 
   @Autowired
-  private ServletContext servletContext;
+  private ImageDirectoryService imageDirectory;
 
   /**
    *
@@ -43,11 +43,17 @@ public class RasterImageService {
    * @param colorMapName
    * @return
    */
-  public RasterImageResult getRasterImage(long rasterId, int projectId, Parameter param, Bounds bounds, String colorMapName) {
+  public RasterImageResult getRasterImage(long rasterId, int projectId, // 
+          Parameter param, Bounds bounds, String colorMapName) {
+
     RasterObj r = this.getRasterObj(rasterId, projectId, param, bounds);
     ColorMap cmap = this.getColorMap(rasterId, projectId, param, colorMapName);
-    RasterImage img = new RasterImage(r, cmap);
-    RasterImageResult result = this.toRasterImageResult(rasterId, img);
+    RasterImageResult result;
+    try (RasterImage img = new RasterImage(r, cmap)) {
+      result = this.toRasterImageResult(rasterId, projectId, param, img);
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    }
     return result;
   }
 
@@ -58,13 +64,15 @@ public class RasterImageService {
    * @param rasterId
    * @return
    */
-  private RasterImageResult toRasterImageResult(long rasterId, RasterImage img) {
+  private RasterImageResult toRasterImageResult( //
+          long rasterId, int projectId, Parameter param, RasterImage img) {
     BufferedImage bufferedImg = img.asBufferedImage();
     int targetSrid = 3857;
     Point upperRight = SridUtils.transform(img.getBounds().upperright(), targetSrid);
     Point lowerLeft = SridUtils.transform(img.getBounds().lowerleft(), targetSrid);
-    String imageURL = this.getImageURL(rasterId, bufferedImg);
-    RasterImageResult result = new RasterImageResult(imageURL, upperRight, lowerLeft, targetSrid, img.colorMapObject());
+    String imageURL = this.getImageURL(projectId, rasterId, param, bufferedImg);
+    RasterImageResult result = new RasterImageResult( //
+            imageURL, upperRight, lowerLeft, targetSrid, img.colorMapObject());
     return result;
   }
 
@@ -90,19 +98,15 @@ public class RasterImageService {
     RasterObj result = this.rastersValueService.getRasterObj(rasterId, projectId, p, bounds);
     return result;
   }
-  
-  
-  
-  @Autowired
-  private ImageDirectoryService imageDirectory;
+
   /**
    *
    * @param rasterId
    * @param bufferedImg
    * @return
    */
-  private String getImageURL(long rasterId, BufferedImage bufferedImg) {
-    File imageFile = this.imageDirectory.createImageFile(rasterId); 
+  private String getImageURL(int projectId, long rasterId, Parameter p, BufferedImage bufferedImg) {
+    File imageFile = this.imageDirectory.createImageFile(projectId, rasterId, p);
     try (ImageOutputStream output = new FileImageOutputStream(imageFile)) {
       ImageIO.write(bufferedImg, "png", output);
     } catch (Exception ex) {
@@ -111,5 +115,23 @@ public class RasterImageService {
     String externalUrl = this.imageDirectory.getExternalUrl();
     String result = externalUrl + File.separator + "data?code=" + imageFile.getName();
     return result;
+  }
+
+  /**
+   *
+   * @param projectId
+   * @param params
+   */
+  public void cleanUpFiles(int projectId, Parameter params) {
+    this.imageDirectory.cleanUpFiles(projectId, params);
+  }
+
+  /**
+   *
+   * @param projectId
+   * @param dateTime
+   */
+  public void cleanUpFiles(int projectId, ZonedDateTime dateTime) {
+    this.imageDirectory.cleanUpFiles(projectId, dateTime);
   }
 }

@@ -8,7 +8,10 @@ import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.channels.OverlappingFileLockException;
+import java.nio.file.Files;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,13 +30,54 @@ public class GribFile {
   public final File grib;
   public final File gribIdx;
 
-  public GribFile(ZonedDateTime datetimeref, int fcststep, NoaaVariable var, File grib, File gribIdx) {
+  /**
+   *
+   * @param rootFolder
+   * @param var
+   * @param subfolder
+   * @param datetimeref
+   * @param fcststep
+   * @param filename
+   * @return
+   */
+  public static GribFile create(File rootFolder, NoaaVariable var, // 
+          int subfolder, ZonedDateTime datetimeref, int fcststep, String filename) {
+    if (filename.contains("//") || filename.contains("\\")) {
+      throw new RuntimeException("Invalid filename");
+    }
+    String datetext = datetimeref //
+            .toOffsetDateTime() //
+            .atZoneSameInstant(ZoneId.of("UTC")) //
+            .format(new DateTimeFormatterBuilder()
+                    .appendPattern("yyyy/MM/dd")
+                    .toFormatter());
+    File parent;
+    if (subfolder >= 0) {
+      parent = new File(rootFolder, String.format("%04d/%s", subfolder, datetext));
+    } else {
+      parent = new File(rootFolder, datetext);
+    }
+    File grib = new File(parent, filename);
+    File gribIdx = new File(parent, filename + ".idx");
+    GribFile result = new GribFile(datetimeref, fcststep, var, grib, gribIdx);
+    return result;
+  }
+
+  /**
+   *
+   * @param datetimeref
+   * @param fcststep
+   * @param var
+   * @param grib
+   * @param gribIdx
+   */
+  private GribFile(ZonedDateTime datetimeref, int fcststep, // 
+          NoaaVariable var, File grib, File gribIdx) {
     this.datetimeref = datetimeref;
     this.fcststep = fcststep;
     this.var = var;
     this.grib = grib;
     this.gribIdx = gribIdx;
-
   }
 
   /**
@@ -95,20 +139,23 @@ public class GribFile {
       if (this.notExists()) {
         return false;
       }
-      FileOutputStream outputStream = new FileOutputStream(this.grib);
-      FileChannel channel = outputStream.getChannel();
-      FileLock lock;
-      try {
-        lock = channel.tryLock();
-      } catch (OverlappingFileLockException ex) {
-        return true;
+      
+      try (FileOutputStream outputStream = new FileOutputStream(this.grib)) {
+        FileChannel channel = outputStream.getChannel();
+        FileLock lock;
+        try {
+          lock = channel.tryLock();
+        } catch (OverlappingFileLockException ex) {
+          return true;
+        }
+        if (lock == null) {
+          return true;
+        } else {
+          lock.release();
+          return false;
+        }
       }
-      if (lock == null) {
-        return true;
-      } else {
-        lock.release();
-        return false;
-      }
+
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
@@ -116,15 +163,19 @@ public class GribFile {
 
   /**
    *
+   * @return
    */
-  public void delete() {
+  public boolean delete() {
+
     try {
-      this.grib.delete();
-      this.gribIdx.delete();
+      boolean result = Files.deleteIfExists(this.grib.toPath());
+      Files.deleteIfExists(this.gribIdx.toPath());
+      return result;
     } catch (Exception ex) {
       Logger.getAnonymousLogger().log(Level.WARNING,// 
               String.format("Deleting grib file '%s'", this.grib), ex);
     }
+    return false;
   }
 
   /**
@@ -172,33 +223,15 @@ public class GribFile {
     }
     return true;
   }
-  
-  /**
-   * 
-   * @return 
-   */
-  @Override
-  public String toString() {
-    return "GribFile{" + "datetimeref=" + datetimeref + ", fcststep=" 
-            + fcststep + ", var=" + var + ", grib=" + grib + ", gribIdx=" + gribIdx + '}';
-  }
-
-  
 
   /**
    *
-   * @param subfolderId
    * @return
    */
-  public GribFile setSubPath(int subfolderId) {
-    File newgrib = new File(
-            String.format("%s\\%04d", grib.getParent(), subfolderId)
-                    .replace("\\", File.separator), grib.getName());
-    File newgribIdx = new File(
-            String.format("%s\\%04d", gribIdx.getParent(), subfolderId)
-                    .replace("\\", File.separator), gribIdx.getName());
-    GribFile result = new GribFile(datetimeref, fcststep, var, newgrib, newgribIdx);
-    return result;
+  @Override
+  public String toString() {
+    return "GribFile{" + "datetimeref=" + datetimeref + ", fcststep="
+            + fcststep + ", var=" + var + ", grib=" + grib + ", gribIdx=" + gribIdx + '}';
   }
 
   /**

@@ -1,4 +1,4 @@
-package titans.noaa.core;
+package titans.noaa.netcdf;
 
 import com.google.common.collect.TreeTraverser;
 import com.google.common.io.Files;
@@ -7,12 +7,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author rmarq
  */
-public class GribFileManager {
+public class NetCdfFileManager {
 
   private final File netCdfRootFolder;
   private final int subfolderId;
@@ -22,7 +24,7 @@ public class GribFileManager {
    * @param netCdfRootFolder
    * @param subfolderId
    */
-  public GribFileManager(File netCdfRootFolder, int subfolderId) {
+  public NetCdfFileManager(File netCdfRootFolder, int subfolderId) {
     this.netCdfRootFolder = netCdfRootFolder;
     this.subfolderId = subfolderId;
   }
@@ -31,11 +33,12 @@ public class GribFileManager {
    *
    * @param dateTime
    */
-  void removeRastersBefore(ZonedDateTime dateTime) {
+  public void removeRastersBefore(ZonedDateTime dateTime) {
     String subPath = String.format("%04d", this.subfolderId);
     File rootFolder = new File(this.netCdfRootFolder, subPath);
-
     TreeTraverser<File> traverser = Files.fileTreeTraverser();
+    Logger.getLogger(this.getClass().getName()) //
+            .log(Level.INFO, "removing rasters in rootfolder {0}", rootFolder);
     Iterable<File> yearFiles = traverser.children(rootFolder);
 
     for (File yearFile : yearFiles) {
@@ -97,7 +100,11 @@ public class GribFileManager {
       java.nio.file.Files.walk(folder.toPath())
               .sorted(Comparator.reverseOrder())
               .map(Path::toFile)
-              .forEach(File::delete);
+              .forEach(f -> {
+                if (!f.delete()) {
+                  throw new RuntimeException("File not deleted.");
+                }
+              });
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

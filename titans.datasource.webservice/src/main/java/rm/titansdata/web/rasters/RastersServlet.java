@@ -90,7 +90,8 @@ public class RastersServlet {
     RequestParser parser = new RequestParser(req);
     int projectId = parser.getInteger("projectId");
     ZonedDateTime zonedDateTime = parser.getZonedDateTime("dateTime", "zoneId");
-    rastersValueService.deleteStoredFilesBefore(projectId, zonedDateTime);
+    this.rastersValueService.deleteStoredFilesBefore(projectId, zonedDateTime);
+    this.rastersImageService.cleanUpFiles(projectId, zonedDateTime);
   }
   
   /**
@@ -337,7 +338,6 @@ public class RastersServlet {
         pointValues.get(pointIndex).values.add(entry.getValue());
       }
     }
-
     String result = JsonConverterUtil.toJson(pointValues);
     this.responseHelper.sendAsZippedFile(result, res);
   }
@@ -512,7 +512,8 @@ public class RastersServlet {
 
   /**
    *
-   */
+   * @param req
+   * @param res */
   @RequestMapping(path = "/clearNetCdfs", method = RequestMethod.POST)
   public void clearNetCdfs(HttpServletRequest req, HttpServletResponse res) {
     NetCdfRaster.clearNetCdfs();
@@ -704,7 +705,15 @@ public class RastersServlet {
     map.put("value", points);
     this.responseHelper.send(map, res);
   }
-
+  
+  /**
+   * 
+   * @param rasterId
+   * @param projectId
+   * @param param
+   * @param geometry
+   * @return 
+   */
   private List<Point> getRasterPoints(Long rasterId, int projectId, Parameter param, Geometry geometry) {
     Raster s = this.rastersValueService.getRaster(rasterId, projectId, param);
     List<Point> points;

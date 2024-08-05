@@ -1,5 +1,7 @@
 package rm.titansdata.heirarchy;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Objects;
 import rm.titansdata.raster.RasterObj;
 
@@ -7,7 +9,7 @@ import rm.titansdata.raster.RasterObj;
  *
  * @author Ricardo Marquez
  */
-public class Node {
+public class Node implements Closeable{
   
   private final RasterObj rasterObj;
 
@@ -70,6 +72,11 @@ public class Node {
    */
   public String getName() {
     return this.getRasterObj().getName();
+  }
+
+  @Override
+  public void close() throws IOException {
+    this.rasterObj.close();
   }
   
 }

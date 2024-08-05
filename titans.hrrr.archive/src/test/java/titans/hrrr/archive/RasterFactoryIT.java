@@ -72,4 +72,10 @@ public class RasterFactoryIT extends BaseSpringITest {
     ZonedDateTime dateTime = RmObjects.dateTimeOfInUtc("yyyy/MM/dd HH:mm", "2023/01/01 00:00");
     this.factory.getImporter(0).removeRastersBefore(dateTime);
   }
+  
+  @Test
+  public void test04() {
+    HrrrSfcInventoryReader reader = new HrrrSfcInventoryReader();
+    reader.read().forEach(System.out::println);
+  }
 }

@@ -1,5 +1,6 @@
 package titans.noaa.grib;
 
+import common.RmExceptions;
 import common.RmObjects;
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class NetCdfExtractor {
   private final NoaaVariable var;
 
   public NetCdfExtractor(File degribExe, File netcdfdir, int subFolderId, NoaaVariable var) {
-    this.degribExe = degribExe;
+    this.degribExe = RmObjects.fileExists(degribExe, "File '%s' does not exist.", degribExe);
     this.netcdfdir = netcdfdir;
     this.subFolderId = subFolderId;
     this.var = var;
@@ -63,28 +64,39 @@ public class NetCdfExtractor {
   private void createParentFileIfDoesNotExists(NetCdfFile netCdfFile) {
     RmObjects.createFileIfDoesNotExists(netCdfFile.file.getParentFile());
   }
-  
-  
+
   /**
-   * 
+   *
    * @param process
-   * @throws RuntimeException 
+   * @throws RuntimeException
    */
   private void runProcess(ProcessBuilder process) throws RuntimeException {
     try {
       Process p = process.start();
       int exitValue = p.waitFor();
       if (exitValue != 0) {
-        throw new RuntimeException("Process failed");
+        String errorMsg;
+        try (InputStream errorstream = p.getErrorStream()) { 
+          if (errorstream != null) {
+            errorMsg = toMessage(errorstream);
+          } else {
+            errorMsg = "";
+          }
+        }
+        throw RmExceptions.create("Process failed with exit value %d. %s", exitValue, errorMsg);
       }
-      InputStream in = p.getInputStream();
-      List<String> lines = toListOfLines(in);
+      List<String> lines;
+      try (InputStream in = p.getInputStream()) {
+        lines = toListOfLines(in);
+      }
       printLines(lines);
-      InputStream errorstream = p.getErrorStream();
-      String errorMsg;
-      if (errorstream != null && !(errorMsg = toMessage(errorstream)).isEmpty()) {
-        printLines(Arrays.asList(errorMsg));
-        throw new RuntimeException(errorMsg);
+      
+      try (InputStream errorstream = p.getErrorStream()) {
+        String errorMsg;
+        if (errorstream != null && !(errorMsg = toMessage(errorstream)).isEmpty()) {
+          printLines(Arrays.asList(errorMsg));
+          throw new RuntimeException(errorMsg);
+        }
       }
     } catch (Exception ex) {
       throw new RuntimeException(ex);
@@ -106,7 +118,7 @@ public class NetCdfExtractor {
       int firstindex = messageNum.indexOf(":", 0);
       int seondindex = messageNum.indexOf(":", firstindex + 1);
       messageNum = messageNum.substring(seondindex + 1, messageNum.length() - 1);
-      messageNum = RmObjects.isWindows() ? "\"" + messageNum + "\"": messageNum ;
+      messageNum = RmObjects.isWindows() ? "\"" + messageNum + "\"" : messageNum;
       result = new ProcessBuilder(
               this.degribExe.getAbsolutePath(),
               gribFile.grib.getAbsolutePath().replace(".gz", ""),

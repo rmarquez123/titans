@@ -393,5 +393,5 @@ public final class NetCdfRaster extends BasicRaster {
     List<GridDatatype> grid = this.getGrid();
     return grid.get(0).getCoordinateSystem();
   }
-
+  
 }

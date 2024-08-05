@@ -42,17 +42,10 @@ public class HrrrArchiveImporter extends NoaaGribImporter {
       .format(new DateTimeFormatterBuilder()
         .appendPattern("HH")
         .toFormatter());
-    String datetext = datetimeref //
-      .toOffsetDateTime() //
-      .atZoneSameInstant(ZoneId.of("UTC")) //
-      .format(new DateTimeFormatterBuilder()
-        .appendPattern("yyyy\\MM\\dd")
-        .toFormatter());
     DecimalFormat decimalFormat = new DecimalFormat("00");
     String fcstHourTxt = decimalFormat.format(fcstHour);
     String prefix = this.getPrefix(var);
-    String filename = String.format("%s\\hrrr.t%sz.%sf%s.grib2", new Object[]{
-      datetext, hourtext, prefix, fcstHourTxt});
+    String filename = String.format("hrrr.t%sz.%sf%s.grib2", new Object[]{hourtext, prefix, fcstHourTxt});
     return filename;
   }
 

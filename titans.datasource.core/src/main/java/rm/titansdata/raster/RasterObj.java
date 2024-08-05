@@ -94,6 +94,7 @@ public class RasterObj implements Closeable{
 
   /**
    *
+   * @param name
    * @param geometry
    * @return
    */

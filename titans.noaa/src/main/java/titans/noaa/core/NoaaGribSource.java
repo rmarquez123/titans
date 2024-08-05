@@ -58,8 +58,8 @@ public abstract class NoaaGribSource {
    */
   private GribFile doDownload(URL gribUrl, GribFile gribFile) {
     RmTimer timer = RmTimer.start();
-    try (OutputStream output = gribFile.getOutputStream()) {
-      InputStream inputStream = gribUrl.openStream();
+    try (OutputStream output = gribFile.getOutputStream(); // 
+            InputStream inputStream = gribUrl.openStream()) {
       System.out.println("downloading from " + gribUrl);
 
       int bytesRead;

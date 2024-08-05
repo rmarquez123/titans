@@ -1,10 +1,12 @@
 package titans.noaa.grib;
 
 import common.RmExceptions;
+import common.RmObjects;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +30,7 @@ public class GribFileVarsReader {
    * @param gribFile
    */
   public GribFileVarsReader(File degribExe, File gribFile) {
-    this.degribExe = degribExe;
+    this.degribExe = RmObjects.fileExists(degribExe, "File '%s' does not exist", degribExe) ;
     this.gribFile = gribFile;
   }
 
@@ -39,7 +41,13 @@ public class GribFileVarsReader {
   public Set<String> parseVarNames() {
     ProcessBuilder process = this.createGribInventoryProcess();
     List<String> processOutput = this.getProcessOutput(process);
-    Set<String> result = this.mapProcessOutputToVarNames(processOutput);
+    Set<String> result;
+    try {
+      result = this.mapProcessOutputToVarNames(processOutput);
+    } catch (Exception ex) {
+      String text = String.join("\n", processOutput);
+      throw RmExceptions.create(ex, "An error occurred parsing variable names from file: \n%s\n", text);
+    }
     return result;
   }
 
@@ -49,8 +57,13 @@ public class GribFileVarsReader {
    * @return
    */
   public String getVarMsgNumber(String varName) {
-    String line = this.getLineForVarName(varName);
-    String result = this.lineToVarMsgNumber(line);
+    String result;
+    try {
+      String line = this.getLineForVarName(varName);
+      result = this.lineToVarMsgNumber(line);
+    } catch (Exception ex) {
+      throw RmExceptions.create(ex, "An error occurred attempting to retrieve line for varName: %s", varName);
+    }
     return result;
   }
 
@@ -62,9 +75,17 @@ public class GribFileVarsReader {
   private String getLineForVarName(String varName) {
     ProcessBuilder process = this.createGribInventoryProcess();
     List<String> processOutput = this.getProcessOutput(process);
+    if (processOutput.isEmpty()) {
+      throw RmExceptions.create("An error occurred "//
+              + "creating grib inventory for '%s' " //
+              + "using '%s'", this.gribFile, this.degribExe);
+    }
     String line;
     if (processOutput.size() > 1) {
-      line = processOutput.stream().filter(l -> this.toVarName(l).equals(varName))
+      line = processOutput //
+              .stream() //
+              .filter(l -> l.contains(":") || l.contains(":")) //
+              .filter(l -> this.toVarName(l).equals(varName))
               .findFirst().orElse(null);
     } else {
       line = processOutput.get(0);
@@ -102,10 +123,11 @@ public class GribFileVarsReader {
    * @return
    */
   private Set<String> mapProcessOutputToVarNames(List<String> processOutput) {
-    Set<String> resutl = processOutput.stream()
+    Set<String> result = processOutput.stream()
+            .filter(l -> l.contains(",") || l.contains(":"))
             .map(this::toVarName)
             .collect(Collectors.toSet());
-    return resutl;
+    return result;
   }
 
   /**
@@ -142,9 +164,7 @@ public class GribFileVarsReader {
                 .replace("cloud top", "0-CTL")
                 .replace("mean sea level", "0-MSL")
                 .replace("middle cloud layer", "0-MCY")
-                .replace("low cloud layer", "0-LCY")
-                
-                ;
+                .replace("low cloud layer", "0-LCY");
         result = elementPrefix + "_" + level;
       } catch (Exception ex) {
         throw RmExceptions.create(ex, "An error occured on parsing line: '%s'", line);
@@ -185,13 +205,16 @@ public class GribFileVarsReader {
     List<String> lines;
     try {
       Process p = process.start();
-      InputStream errorstream = p.getErrorStream();
-      String message;
-      if (errorstream != null && !(message = this.streamToString(errorstream)).isEmpty()) {
-        throw new RuntimeException(message);
+      Thread.sleep(Duration.ofSeconds(2l));
+      try (InputStream errorstream = p.getErrorStream()) {
+        String message;
+        if (errorstream != null && !(message = this.streamToString(errorstream)).isEmpty()) {
+          throw new RuntimeException(message);
+        }
       }
-      InputStream in = p.getInputStream();
-      lines = IOUtils.readLines(in, Charset.forName("utf8"));
+      try (InputStream in = p.getInputStream()) {
+        lines = IOUtils.readLines(in, Charset.forName("utf8"));
+      }
       lines.stream().filter(l -> l.contains("Error")).findFirst().ifPresent((errorline) -> {
         throw new RuntimeException(errorline);
       });

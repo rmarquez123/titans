@@ -1,9 +1,11 @@
 package titans.noaa.netcdf;
 
+import common.RmObjects;
 import java.io.File;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.measure.unit.Unit;
 import titans.noaa.core.NoaaParameter;
 import titans.noaa.core.NoaaVariable;
@@ -55,10 +57,8 @@ public class NetCdfFileOrganization {
    */
   private String getSubFilePath() {
     String filename = this.getFileName();
-    int year = this.datetime.getYear();
-    int month = this.datetime.getMonthValue();
-    int day = this.datetime.getDayOfMonth();
-    String child = String.format("%04d/%02d/%02d/%s", year, month, day, filename);
+    String dateSubPath = this.getDateSubPath();
+    String child = String.format("%s/%s", dateSubPath, filename);
     return child;
   }
 
@@ -67,12 +67,21 @@ public class NetCdfFileOrganization {
    * @return
    */
   private String getFileName() {
-    DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-            .appendPattern("yyyyMMddHHmm")
-            .toFormatter();
-    String format = this.datetime.format(formatter);
+    String formattedDate = RmObjects.formatUtc(datetime, "yyyyMMddHHmm");
     String varName = var.getGribVarName();
-    String filename = String.format("%s_%s_%03d.nc", varName.replace(".", "_dot_"), format, this.fcststep);
+    String varNameText = varName.replace(".", "_dot_");
+    String filename = String.format("%s_%s_%03d.nc", varNameText, formattedDate, this.fcststep);
+    return filename;
+  }
+
+  /**
+   *
+   * @return
+   */
+  private String getWildCardVarFileName() {
+    String formatedDate = RmObjects.formatUtc(datetime, "yyyyMMddHHmm");
+    String varNameText = "*";
+    String filename = String.format("%s_%s_%03d.nc", varNameText, formatedDate, this.fcststep);
     return filename;
   }
 
@@ -95,6 +104,43 @@ public class NetCdfFileOrganization {
     ForecastTimeReference d = new ForecastTimeReference(0, fcststep);
     NoaaParameter namParameter = new NoaaParameter(gribVarName, datetime, d, gribVarName, Unit.ONE);
     NetCdfFile result = NetCdfFile.create(baseFolder, subFolderId, namParameter);
+    return result;
+  }
+
+  /**
+   *
+   * @return
+   */
+  private String getDateSubPath() {
+    int year = this.datetime.getYear();
+    int month = this.datetime.getMonthValue();
+    int day = this.datetime.getDayOfMonth();
+    String result = String.format("%04d/%02d/%02d", year, month, day);
+    return result;
+  }
+
+  /**
+   *
+   * @return
+   */
+  List<File> getFiles() {
+    String filename = this.getWildCardVarFileName();
+    String dateSubPath = this.getDateSubPath();
+    File subBaseFolder = this.getBaseFolder();
+    File targetBaseFolder = new File(subBaseFolder, dateSubPath.replaceAll("\\\\", File.separator));
+    File[] a = targetBaseFolder.listFiles((File dir, String name) -> {
+      ///   should compare with filename which has a wildcard (*).
+      //  For example, if name is abcdef and wildcard is ab*f, then this would be a match
+      //  If name is abcd and wildcard is ab*f, then this would not be a match.
+      String regex = filename.replace("*", ".*");
+      boolean matches = name.matches(regex);
+      return matches;
+    });
+
+    List<File> result = new ArrayList<>();
+    if (a != null) {
+      result.addAll(Arrays.asList(a));
+    }
     return result;
   }
 }

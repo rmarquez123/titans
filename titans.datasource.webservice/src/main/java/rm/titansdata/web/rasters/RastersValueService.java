@@ -1,6 +1,5 @@
 package rm.titansdata.web.rasters;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -60,15 +59,12 @@ public class RastersValueService {
     if (geometry.getGeometryType().equals("Point")) {
       throw new RuntimeException("Does not support 'Point' geometry type");
     }
-    RasterObj subset = rasterObj.getSubsetRaster(sourceTitle, geometry);
-    if (rasterObj.getRaster() instanceof Closeable) {
-      try {
-        ((Closeable) rasterObj.getRaster()).close();
-      } catch (IOException ex) {
-        throw new RuntimeException(ex);
-      }
+    RasterCells result;
+    try (RasterObj subset = rasterObj.getSubsetRaster(sourceTitle, geometry)) {
+      result = subset.interleave();
+    } catch(Exception ex) {
+      throw new RuntimeException(ex);
     }
-    RasterCells result = subset.interleave();
     return result;
   }
 
@@ -81,9 +77,13 @@ public class RastersValueService {
    */
   double getRasterValue(Long rasterId, int projectId, Parameter p, Point point) {
     RasterEntity rasterEntity = this.sourceService.getRaster(rasterId);
-    RasterObj rasterObj = this.getRasterObj(rasterEntity, rasterEntity.sourceTitle, //
-            projectId, p, rasterEntity.getBounds());
-    double result = rasterObj.getValue(point);
+    double result;
+    try (RasterObj rasterObj = this.getRasterObj(rasterEntity, rasterEntity.sourceTitle, //
+            projectId, p, rasterEntity.getBounds())) {
+      result = rasterObj.getValue(point);
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
     return result;
   }
 
@@ -179,21 +179,21 @@ public class RastersValueService {
             .collect(Collectors.toMap(pair -> pair.getKey(), pair -> pair.getValue()));
     return result;
   }
-  
+
   /**
-   * 
-   * @param dateTime 
+   *
+   * @param dateTime
    */
   void deleteStoredFilesBefore(int projectId, ZonedDateTime dateTime) {
     this.supplier.deleteStoredFilesBefore(projectId, dateTime);
-  } 
-    
+  }
+
   /**
-   * 
+   *
    * @param projectId
    * @param param
    * @param dateTime
-   * @param fcstStep 
+   * @param fcstStep
    */
   void deleteIntermediateFiles(int projectId, Parameter param, ZonedDateTime dateTime, int fcstStep) {
     this.supplier.deleteIntermediateFiles(projectId, param, dateTime, fcstStep);

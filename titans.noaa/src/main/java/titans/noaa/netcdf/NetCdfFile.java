@@ -1,11 +1,13 @@
 package titans.noaa.netcdf;
 
 import common.RmObjects;
+import common.geom.SridUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import javax.measure.Measure;
@@ -19,7 +21,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
-import common.geom.SridUtils;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimension;
 import rm.titansdata.properties.Dimensions;
@@ -36,6 +37,8 @@ import ucar.unidata.geoloc.LatLonRect;
  * @author Ricardo Marquez
  */
 public class NetCdfFile {
+
+  
 
   private final String varName;
   public final File file;
@@ -218,7 +221,23 @@ public class NetCdfFile {
     NetCdfFile instance = new NetCdfFile(varName, file);
     return instance;
   }
-
+    
+  /**
+   * 
+   * @param baseFolder
+   * @param subfolderId
+   * @param datetimeref
+   * @param forecaststep
+   * @return 
+   */
+  public static List<File> getVarNameWildCardFiles(
+          File baseFolder, int subfolderId, ZonedDateTime datetimeref, int forecaststep) {
+    NetCdfFileOrganization org = new NetCdfFileOrganization(
+      baseFolder, subfolderId, forecaststep, datetimeref, null);
+    List<File> result = org.getFiles();
+    return result;
+  }
+  
   /**
    *
    * @param varName

@@ -18,11 +18,7 @@ public class GribFileVarsReaderIT {
   
   @Test
   public void test() {
-    File grib = new File("D:\\tests\\data\\grib\\hrrr.archive\\2023\\12\\26\\hrrr.t00z.wrfsfcf00.grib2");
-    File gribIdx = new File("D:\\tests\\data\\grib\\hrrr.archive\\2023\\12\\26\\hrrr.t00z.wrfsfcf00.grib2");
-    ZonedDateTime datetimeref = ZonedDateTime.of(2023, 12, 26, 0, 0, 0, 0, ZoneId.of("UTC")); 
-    NoaaVariable var = new NoaaVariable("TMP", Unit.ONE);
-    GribFile gribFile = new GribFile(datetimeref, 0, var, grib, gribIdx); 
+    File grib = new File("D:\\tests\\data\\grib\\hrrr.archive\\2023\\12\\26\\hrrr.t00z.wrfsfcf00.grib2");    
     File degribExe = new File("C:\\ndfd\\degrib\\bin\\degrib.exe");
     GribFileVarsReader reader = new GribFileVarsReader(degribExe, grib);
     Set<String> varNames = reader.parseVarNames();
@@ -33,10 +29,6 @@ public class GribFileVarsReaderIT {
   @Test
   public void test2() {
     File grib = new File("D:\\tests\\data\\grib\\hrrr.archive\\2023\\12\\26\\hrrr.t00z.wrfsfcf00.grib2");
-    File gribIdx = new File("D:\\tests\\data\\grib\\hrrr.archive\\2023\\12\\26\\hrrr.t00z.wrfsfcf00.grib2");
-    ZonedDateTime datetimeref = ZonedDateTime.of(2023, 12, 26, 0, 0, 0, 0, ZoneId.of("UTC")); 
-    NoaaVariable var = new NoaaVariable("TMP", Unit.ONE);
-    GribFile gribFile = new GribFile(datetimeref, 0, var, grib, gribIdx); 
     File degribExe = new File("C:\\Users\\rmarq\\Downloads\\wgrib2\\wgrib2.exe");
     GribFileVarsReader reader = new GribFileVarsReader(degribExe, grib);
     Set<String> varNames = reader.parseVarNames();
@@ -50,12 +42,13 @@ public class GribFileVarsReaderIT {
     File degribExe = new File("C:\\Users\\rmarq\\Downloads\\wgrib2\\wgrib2.exe");
     File netcdfdir = new File("D:\\tests\\data"); 
     NetCdfExtractor reader = new NetCdfExtractor(degribExe, netcdfdir, 0, var); 
-    File grib = new File("D:\\tests\\data\\grib\\hrrr.archive\\2023\\12\\26\\hrrr.t00z.wrfsfcf00.grib2");
-    File gribIdx = new File("D:\\tests\\data\\grib\\hrrr.archive\\2023\\12\\26\\hrrr.t00z.wrfsfcf00.grib2");
-    ZonedDateTime datetimeref = ZonedDateTime.of(2023, 12, 26, 0, 0, 0, 0, ZoneId.of("UTC")); 
-    GribFile gribFile = new GribFile(datetimeref, 0, var, grib, gribIdx);
+    ZonedDateTime datetimeref = ZonedDateTime.of(2023, 12, 26, 0, 0, 0, 0, ZoneId.of("UTC"));
+    File rootFolder = new File("D:\\tests\\data\\grib\\hrrr.archive"); 
+    int fcstStep = 0;
+    int subFolder = -1;
+    String filename = "hrrr.t00z.wrfsfcf00.grib2";
+    GribFile gribFile = GribFile.create(rootFolder, var, subFolder, datetimeref, fcstStep, filename);
     NetCdfFile netCdfFile = reader.extract(gribFile);
-    
     NetCdfRaster raster = new NetCdfRaster(netCdfFile, netCdfFile.getBounds(), netCdfFile.getDimensions());
     double value = raster.getValue(netCdfFile.getBounds().getCenter()); 
     System.out.println("value = " + value);

@@ -2,6 +2,7 @@ package rm.titansdata.images;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import javafx.util.Pair;
@@ -17,7 +18,7 @@ import rm.titansdata.raster.RasterSearch;
  *
  * @author Ricardo Marquez
  */
-public class RasterImage {
+public class RasterImage implements Closeable{
 
   private final RasterObj r;
 
@@ -149,4 +150,14 @@ public class RasterImage {
     ColorMapObject instance = new ColorMapObject(this.cmap.xmin, this.cmap.xmax, this.cmap.units, this.cmap.colorMapName);
     return instance; 
   }
+  
+  /**
+   * 
+   * @throws IOException 
+   */
+  @Override
+  public void close() throws IOException {
+    this.r.close();
+  }
+  
 }

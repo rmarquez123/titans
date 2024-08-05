@@ -69,27 +69,31 @@ public class DisplayFunctionsIT {
   public void partial_image( //
           double x1, double y1, double x2, double y2, int srid, String arg) throws Exception {
 
-    RasterObj rasterobj = RasterITTestData.getBasicRasterObj();
-    double max = Arrays.stream(rasterobj.interleave().values())
-            .max()
-            .orElseThrow(() -> new RuntimeException());
-    ColorMap cmap = new ColorMap.Builder()
-            .setColorMapName("Viridis")
-            .setXmin(0)
-            .setXmax(max)
-            .build();
-    PrecisionModel precisionModel = new PrecisionModel(PrecisionModel.FLOATING);
-    GeometryFactory factory = new GeometryFactory(precisionModel, srid);
-    Polygon p = factory.createPolygon(new Coordinate[]{
-      new Coordinate(x1, y1),
-      new Coordinate(x2, y1),
-      new Coordinate(x2, y2),
-      new Coordinate(x1, y2),
-      new Coordinate(x1, y1),});
-    RasterObj subset = rasterobj.getSubsetRaster("subset", p);
-    RasterImage image = new RasterImage(subset, cmap);
-    BufferedImage bufferedImage = image.asBufferedImage();
-    File outputfile = new File(arg);
-    ImageIO.write(bufferedImage, "jpg", outputfile);
+    ColorMap cmap;
+    RasterObj subset;
+    try (RasterObj rasterobj = RasterITTestData.getBasicRasterObj()) {
+      double max = Arrays.stream(rasterobj.interleave().values())
+              .max()
+              .orElseThrow(() -> new RuntimeException());
+      cmap = new ColorMap.Builder()
+              .setColorMapName("Viridis")
+              .setXmin(0)
+              .setXmax(max)
+              .build();
+      PrecisionModel precisionModel = new PrecisionModel(PrecisionModel.FLOATING);
+      GeometryFactory factory = new GeometryFactory(precisionModel, srid);
+      Polygon p = factory.createPolygon(new Coordinate[]{
+        new Coordinate(x1, y1),
+        new Coordinate(x2, y1),
+        new Coordinate(x2, y2),
+        new Coordinate(x1, y2),
+        new Coordinate(x1, y1),});
+      subset = rasterobj.getSubsetRaster("subset", p);
+    }
+    try (RasterImage image = new RasterImage(subset, cmap)) {
+      BufferedImage bufferedImage = image.asBufferedImage();
+      File outputfile = new File(arg);
+      ImageIO.write(bufferedImage, "jpg", outputfile);
+    }
   }
 }

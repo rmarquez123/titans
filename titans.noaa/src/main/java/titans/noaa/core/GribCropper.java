@@ -39,15 +39,17 @@ public class GribCropper {
       return false;
     }
     GribFile target = this.copyTempFileToSubFolder(gribFile, subfolderId, tempgrib);
-    tempgrib.delete();
+    if (!tempgrib.delete()) {
+      throw new RuntimeException("Grib file not deleted.");
+    }  
     boolean result = target.exists();
     return result;
   }
-  
+
   /**
-   * 
+   *
    * @param gribFile
-   * @return 
+   * @return
    */
   private File getTempGribFile(GribFile gribFile) {
     String basefilename = gribFile.getBaseFileName().replace(".", "-");
@@ -57,57 +59,63 @@ public class GribCropper {
   }
 
   /**
-   * 
+   *
    * @param gribFile
    * @param subfolderId
    * @param tempgrib
-   * @return 
+   * @return
    */
   private GribFile copyTempFileToSubFolder(GribFile gribFile, int subfolderId, File tempgrib) {
-    GribFile target = gribFile.setSubPath(subfolderId);
+    GribFile target = gribFile;
     if (!target.exists()) {
       target.createFile();
     }
     try (OutputStream outstream = new FileOutputStream(target.grib); //
-      FileInputStream instream = new FileInputStream(tempgrib)) {
+             FileInputStream instream = new FileInputStream(tempgrib)) {
       IOUtils.copy(instream, outstream);
-    } catch(Exception ex) {
+    } catch (Exception ex) {
       throw new RuntimeException(ex);
     }
     return target;
   }
-  
+
   /**
-   * 
+   *
    * @param bounds
    * @param gribFile
    * @param tempgribfilename
-   * @throws RuntimeException 
+   * @throws RuntimeException
    */
   private void doCrop(Bounds bounds, GribFile gribFile, File tempgrib) {
     Bounds transformed = bounds.transform(4326);
     Point lwlf = transformed.lowerleft();
     Point uprt = transformed.upperright();
+    if (this.degribExe.getName().contains("wgrib2")) {
+      return; 
+    }
     ProcessBuilder result = new ProcessBuilder(
-      degribExe.getAbsolutePath().replace(".exe", ""),
-      gribFile.grib.getAbsolutePath().replace(".gz", ""),
-      "-C", "-msg", "0", "-Grib2",
-      "-lwlf", String.format("%f,%f", lwlf.getY(), lwlf.getX()),
-      "-uprt", String.format("%f,%f", uprt.getY(), uprt.getX()),
-      "-out", tempgrib.getAbsolutePath()
+            degribExe.getAbsolutePath().replace(".exe", ""),
+            gribFile.grib.getAbsolutePath().replace(".gz", ""),
+            "-C", "-msg", "0", "-Grib2",
+            "-lwlf", String.format("%f,%f", lwlf.getY(), lwlf.getX()),
+            "-uprt", String.format("%f,%f", uprt.getY(), uprt.getX()),
+            "-out", tempgrib.getAbsolutePath()
     );
     File workingDirectory = gribFile.grib.getParentFile();
     result.directory(workingDirectory);
     result.redirectErrorStream(true);
     try {
       Process p = result.start();
-      InputStream in = p.getInputStream();
-      List<String> lines = toListOfLines(in);
+      List<String> lines;
+      try (InputStream in = p.getInputStream()) {
+        lines = toListOfLines(in);
+      }
       printLines(lines);
-      InputStream errorstream = p.getErrorStream();
-      String errorMsg;
-      if (errorstream != null && !(errorMsg = toMessage(errorstream)).isEmpty()) {
-        throw new RuntimeException(errorMsg);
+      try (InputStream errorstream = p.getErrorStream()) {
+        String errorMsg;
+        if (errorstream != null && !(errorMsg = toMessage(errorstream)).isEmpty()) {
+          throw new RuntimeException(errorMsg);
+        }
       }
     } catch (Exception ex) {
       throw new RuntimeException(ex);
@@ -140,5 +148,4 @@ public class GribCropper {
     return String.join("\n", toListOfLines(errorstream));
   }
 
-  
 }
