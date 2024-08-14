@@ -98,20 +98,16 @@ public abstract class NoaaGribImporter implements NoaaImporter {
    */
   private GribFile downloadGribFile(NoaaVariable var, Bounds bounds, // 
           ZonedDateTime datetimeref, int forecaststep) {
-
     GribFile gribFile = this.getGribFile(var, datetimeref, forecaststep);
-
     GribFile result;
     if (gribFile.exists()) {
-      result = this.crop(gribFile, bounds, gribFile);
-    } else if (gribFile.exists()) {
       result = gribFile;
     } else {
       NoaaGribSource source = this.getGribSource();
       result = source.download(gribFile);
-      if (this.onIsGribCroppable()) {
-        result = this.crop(result, bounds, gribFile);
-      }
+//      if (this.onIsGribCroppable()) {
+//        result = this.crop(result, bounds, gribFile);
+//      }
     }
     return result;
   }

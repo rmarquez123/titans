@@ -1,6 +1,6 @@
 package titans.nam;
 
-import titans.noaa.core.NoaaParameter;
+import common.geom.SridUtils;
 import java.io.File;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -9,13 +9,13 @@ import javax.measure.unit.Unit;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import rm.titansdata.Parameter;
-import rm.titansdata.SridUtils;
 import rm.titansdata.colormap.ColorMap;
 import rm.titansdata.images.RasterImage;
 import rm.titansdata.plugin.ColorMapProvider;
 import rm.titansdata.raster.RasterObj;
 import titans.nam.core.NamImporter;
 import titans.nam.core.NamInventoryReader;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.core.NoaaVariable;
 import titans.noaa.grib.ForecastTimeReference;
 
@@ -59,7 +59,7 @@ public class NamImporterIT {
     ColorMapProvider cmprovider = new NamColorMapProvider(netCdfRootFolder);
     ForecastTimeReference ref = new ForecastTimeReference(refdate.getHour(), forecastStep);
     Parameter param = new NoaaParameter(parentKey, refdate, ref, varName, unit);
-    ColorMap cmap = cmprovider.getColorMap(0, param);
+    ColorMap cmap = cmprovider.getColorMap(0, "Teal", param);
     RasterImage image = new RasterImage(raster, cmap);
     File output = new File(gribRootFolder, "image.png");
     image.writeToFile("png", output);

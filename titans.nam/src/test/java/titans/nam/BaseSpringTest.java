@@ -1,10 +1,10 @@
 package titans.nam;
 
+import common.geom.SridUtils;
 import org.junit.Before;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.TestContextManager;
-import rm.titansdata.SridUtils;
 
 /**
  *

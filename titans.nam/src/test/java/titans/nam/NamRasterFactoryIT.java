@@ -1,6 +1,6 @@
 package titans.nam;
 
-import titans.noaa.core.NoaaParameter;
+import common.geom.SridUtils;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -17,11 +17,11 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import rm.titansdata.SridUtils;
 import rm.titansdata.properties.Bounds;
 import rm.titansdata.properties.Dimensions;
 import rm.titansdata.raster.Raster;
 import titans.nam.core.NamInventoryReader;
+import titans.noaa.core.NoaaParameter;
 import titans.noaa.grib.ForecastTimeReference;
 
 /**

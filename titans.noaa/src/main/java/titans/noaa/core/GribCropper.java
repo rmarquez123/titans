@@ -91,7 +91,7 @@ public class GribCropper {
     Point lwlf = transformed.lowerleft();
     Point uprt = transformed.upperright();
     if (this.degribExe.getName().contains("wgrib2")) {
-      return; 
+      return ; 
     }
     ProcessBuilder result = new ProcessBuilder(
             degribExe.getAbsolutePath().replace(".exe", ""),
